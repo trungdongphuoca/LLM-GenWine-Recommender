@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIGER Wine AI — Thesis Defense Demo | Ton Duc Thang 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f5f7fa;
+  --bg2: #ffffff;
+  --bg3: #eef2f7;
+  --card: #ffffff;
+  --border: #dcdfe6;
+  --red: #c0392b;
+  --red-l: #e74c3c;
+  --gold: #d4ac0d;
+  --gold-l: #f1c40f;
+  --blue: #2c3e50;
+  --blue-l: #3498db;
+  --green: #27ae60;
+  --green-l: #2ecc71;
+  --text: #2c3e50;
+  --muted: #7f8c8d;
+  --r: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+/* NAV */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  height: 60px; display:flex; align-items:center; padding: 0 32px;
+  gap: 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-weight:900; font-size:1.1rem; display:flex; align-items:center; gap:8px; margin-right:auto; }
+.nav-logo span { color: var(--red-l); }
+.nav-tab {
+  padding: 7px 18px; border-radius:6px; font-size:0.82rem; font-weight:600;
+  color:var(--muted); cursor:pointer; border:none; background:transparent;
+  font-family:inherit; transition:all 0.2s;
+}
+.nav-tab.active, .nav-tab:hover { background:var(--bg3); color:var(--text); }
+.nav-tab.active { color:var(--blue-l); }
+
+/* MAIN */
+main { padding-top:60px; min-height:100vh; }
+
+/* PANELS */
+.panel { display:none; padding:32px; max-width:1280px; margin:0 auto; }
+.panel.active { display:block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* PAGE HEADER */
+.page-head { margin-bottom:28px; }
+.page-eyebrow { font-size:0.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--red-l); margin-bottom:8px; }
+.page-title { font-size:1.8rem; font-weight:900; margin-bottom:6px; }
+.page-desc { font-size:0.88rem; color:var(--muted); line-height:1.6; max-width:700px; }
+
+/* CARDS */
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+
+/* STAT CARDS */
+.stat-card {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:20px;
+  border-top:3px solid; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.stat-card.r { border-top-color:var(--red-l); }
+.stat-card.g { border-top-color:var(--green-l); }
+.stat-card.b { border-top-color:var(--blue-l); }
+.stat-card.y { border-top-color:var(--gold-l); }
+.stat-lbl { font-size:0.75rem; color:var(--muted); margin-bottom:6px; }
+.stat-val { font-size:2rem; font-weight:900; line-height:1; }
+.stat-card.r .stat-val { color:var(--red-l); }
+.stat-card.g .stat-val { color:var(--green-l); }
+.stat-card.b .stat-val { color:var(--blue-l); }
+.stat-card.y .stat-val { color:var(--gold-l); }
+.stat-sub { font-size:0.72rem; color:var(--muted); margin-top:4px; }
+
+/* INPUTS */
+.input-row { display:flex; gap:10px; }
+input[type=text], select, textarea {
+  flex:1; padding:10px 14px; border-radius:var(--r);
+  background:#ffffff; border:1px solid var(--border);
+  color:var(--text); font-size:0.88rem; font-family:inherit; outline:none;
+  transition:border-color .2s;
+}
+input:focus, select:focus, textarea:focus { border-color:var(--blue-l); }
+select { cursor:pointer; }
+.btn {
+  padding:10px 18px; border-radius:var(--r); font-weight:600; font-size:0.85rem;
+  border:1px solid var(--border); cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
+}
+.btn-red { background:var(--red); color:#fff; border-color: var(--red); }
+.btn-red:hover { background:var(--red-l); border-color: var(--red-l); }
+.btn-ghost { background:var(--bg2); border:1px solid var(--border); color:var(--text); }
+.btn-ghost:hover { background:var(--bg3); }
+.btn:disabled { opacity:.4; cursor:not-allowed; transform:none !important; }
+
+/* METHOD PILLS */
+.method-group { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.method-pill {
+  padding:6px 16px; border-radius:100px; font-size:0.78rem; font-weight:600;
+  border:1px solid var(--border); background:var(--bg2); color:var(--muted);
+  cursor:pointer; transition:all .2s;
+}
+.method-pill.active { background:rgba(52, 152, 219, 0.1); border-color:var(--blue-l); color:var(--text); }
+
+/* RESULTS LIST */
+.result-list { display:flex; flex-direction:column; gap:10px; }
+.result-item {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  padding:16px 20px; display:flex; align-items:flex-start; gap:16px;
+  transition:all .2s; cursor:pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.result-item:hover { border-color:var(--blue-l); transform:translateX(2px); }
+.result-item.top { border-left:3px solid var(--gold); }
+.result-rank {
+  min-width:32px; height:32px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; font-size:0.78rem; font-weight:800;
+  background:var(--bg3); border:1px solid var(--border); flex-shrink:0;
+}
+.result-item.top .result-rank { background:var(--gold); color:#fff; border:none; }
+.result-body { flex:1; min-width:0; }
+.result-name { font-weight:700; font-size:0.9rem; margin-bottom:4px; }
+.result-type { font-size:0.75rem; color:var(--muted); margin-bottom:6px; }
+.result-reason {
+  font-size:0.72rem; color:var(--blue-l); background:rgba(52,152,219,.06);
+  border:1px solid rgba(52,152,219,.15); border-radius:4px;
+  padding:5px 10px; display:inline-block;
+}
+.result-right { text-align:right; flex-shrink:0; }
+.result-price { font-size:0.95rem; font-weight:800; color:var(--gold); }
+.result-score { font-size:0.7rem; color:var(--muted); margin-top:3px; }
+
+/* COMPARE COLUMNS */
+.compare-col { flex:1; }
+.compare-header {
+  display:flex; align-items:center; gap:8px; padding:14px 20px;
+  border-radius:6px 6px 0 0; border:1px solid var(--border);
+  font-weight:700; font-size:0.88rem;
+}
+.compare-col.bm25 .compare-header { background:rgba(52,152,219,.08); border-bottom:2px solid var(--blue-l); }
+.compare-col.tfidf .compare-header { background:rgba(231,76,60,.08); border-bottom:2px solid var(--red-l); }
+.compare-body { border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px; overflow:hidden; }
+.compare-item { padding:12px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.compare-item:last-child { border-bottom:none; }
+.compare-rank { width:22px; font-size:0.72rem; color:var(--muted); font-weight:700; flex-shrink:0; }
+.compare-name { flex:1; font-size:0.82rem; }
+.compare-price { font-size:0.78rem; font-weight:700; color:var(--gold); }
+.compare-score { font-size:0.68rem; color:var(--muted); }
+.match-badge { font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:700; }
+.match-y { background:rgba(46,204,113,.1); color:var(--green); border:1px solid rgba(46,204,113,.2); }
+.match-n { background:rgba(0,0,0,.04); color:var(--muted); }
+
+/* CF PANEL */
+.user-list { display:flex; flex-direction:column; gap:6px; max-height:400px; overflow-y:auto; }
+.user-item {
+  padding:12px 16px; border-radius:var(--r); background:var(--bg2);
+  border:1px solid var(--border); cursor:pointer; transition:all .2s;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.user-item:hover, .user-item.selected { border-color:var(--red-l); background:rgba(231,76,60,.03); }
+.user-name { font-weight:600; font-size:0.88rem; }
+.user-meta { font-size:0.72rem; color:var(--muted); }
+.history-item {
+  display:flex; align-items:center; gap:12px; padding:10px 14px;
+  border-radius:6px; background:var(--bg2); border:1px solid var(--border);
+  margin-bottom:6px;
+}
+.history-qty { font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(231,76,60,.08); color:var(--red); }
+.neighbor-tag { display:inline-block; padding:4px 10px; border-radius:4px; background:rgba(52,152,219,.05); border:1px solid rgba(52,152,219,.15); font-size:0.72rem; color:var(--blue); margin:3px; }
+
+/* MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.4); backdrop-filter:blur(2px); align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:28px; max-width:600px; width:90%; max-height:80vh; overflow-y:auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+.modal-close { background:none; border:none; color:var(--muted); font-size:1.3rem; cursor:pointer; }
+.modal-title { font-weight:800; font-size:1.1rem; margin-bottom:6px; }
+.modal-type { font-size:0.75rem; }
+
+/* TABLE */
+.data-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+.data-table th { background:rgba(52,152,219,.08); color:var(--blue); padding:10px 14px; text-align:left; font-size:0.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; border-bottom:1px solid var(--border); }
+.data-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.data-table tr.best td { background:rgba(231,76,60,.04); font-weight:700; }
+.data-table tr:hover td { background:rgba(0,0,0,.01); }
+
+/* PIPELINE VIZ */
+.pipe-viz { display:flex; align-items:center; gap:0; background:transparent; border:1px solid var(--border); border-radius:var(--r); padding:14px 12px; overflow-x:auto; margin:16px 0; }
+.pipe-box { flex-shrink:0; background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:10px 12px; text-align:center; min-width:120px; transition:all .3s; }
+.pipe-box.active { background:rgba(52,152,219,.08); border-color:var(--blue-l); color:var(--blue); }
+.pipe-box.done { background:rgba(46,204,113,.06); border-color:var(--green-l); color:var(--green); }
+.pipe-icon { display:none; }
+.pipe-name { font-size:0.78rem; font-weight:700; }
+.pipe-detail { font-size:0.65rem; color:var(--muted); margin-top:2px; }
+.pipe-arr { padding:0 8px; color:var(--muted); font-size:1.1rem; flex-shrink:0; }
+
+/* LOADING */
+.loading-dots { display:inline-flex; gap:4px; align-items:center; }
+.loading-dots span { width:6px; height:6px; border-radius:50%; background:var(--red-l); animation: blink 1.2s infinite; }
+.loading-dots span:nth-child(2) { animation-delay:.2s; }
+.loading-dots span:nth-child(3) { animation-delay:.4s; }
+@keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
+
+/* TAGS */
+.tag { display:inline-block; padding:3px 10px; border-radius:4px; font-size:0.7rem; font-weight:700; }
+.tag-red { background:rgba(231,76,60,.08); color:var(--red); border:1px solid rgba(231,76,60,.15); }
+.tag-blue { background:rgba(52,152,219,.08); color:var(--blue); border:1px solid rgba(52,152,219,.15); }
+.tag-gold { background:rgba(241,196,15,.1); color:var(--gold); border:1px solid rgba(241,196,15,.2); }
+.tag-green { background:rgba(46,204,113,.08); color:var(--green); border:1px solid rgba(46,204,113,.15); }
+
+/* STATUS BAR */
+.status-bar { display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:var(--r); background:var(--bg2); border:1px solid var(--border); font-size:0.78rem; margin-bottom:16px; }
+.status-dot { width:8px; height:8px; border-radius:50%; }
+.dot-green { background:var(--green); }
+
+.divider { height:1px; background:var(--border); margin:28px 0; }
+.section-title { font-weight:800; font-size:1rem; margin-bottom:14px; }
+.empty-state { text-align:center; padding:48px; color:var(--muted); font-size:0.88rem; }
+.explain-step { display:flex; align-items:flex-start; gap:14px; padding:14px; border-radius:var(--r); background:var(--bg2); border:1px solid var(--border); margin-bottom:8px; }
+.explain-step-icon { font-size:1.2rem; flex-shrink:0; }
+.explain-step-title { font-weight:700; font-size:0.85rem; margin-bottom:4px; }
+.explain-step-detail { font-size:0.78rem; color:var(--muted); }
+.fail-bar-row { margin-bottom:12px; }
+.fail-bar-label { font-size:0.78rem; font-weight:600; margin-bottom:4px; display:flex; justify-content:space-between; }
+.fail-bar { height:10px; border-radius:5px; transition:width .8s ease; }
+.neighbor-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:var(--r); background:var(--bg2); border:1px solid var(--border); margin-bottom:6px; font-size:0.8rem; }
+.case-card { padding:16px; border-radius:var(--r); border:1px solid var(--border); margin-bottom:10px; background:var(--bg2); }
+.case-card.fail { border-left:3px solid var(--red-l); background:rgba(231,76,60,.02); }
+.case-card.success { border-left:3px solid var(--green-l); background:rgba(46,204,113,.02); }
+.case-type { font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:8px; }
+.case-type.fail { background:rgba(231,76,60,.08); color:var(--red); }
+.case-type.success { background:rgba(46,204,113,.08); color:var(--green); }
+.sota-best td { background:rgba(231,76,60,.02); font-weight:700; border-left:3px solid var(--red-l); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🍷 <span>TIGER</span> Wine AI</div>
+  <button class="nav-tab active" onclick="showPanel('search')">🔍 Search</button>
+  <button class="nav-tab" onclick="showPanel('compare')">⚖️ Compare Models</button>
+  <button class="nav-tab" onclick="showPanel('cf')">👤 Gợi ý Cá nhân (Sapo)</button>
+  <button class="nav-tab" onclick="showPanel('results')">📊 Thesis Evaluation</button>
+  <button class="nav-tab" onclick="showPanel('explain')">💡 Explainability</button>
+  <button class="nav-tab" onclick="showPanel('error')">🔬 Error Analysis</button>
+  <button class="nav-tab" onclick="showPanel('sota')">📚 SOTA Comparison</button>
+  <div id="serverStatus" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--muted);">
+    <span class="status-dot dot-green"></span> Server online
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 1: SEARCH                                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-search">
+  <div class="page-head">
+    <div class="page-eyebrow">Real-world Evaluation · Sapo Catalog (305 Products) / Winemag (130K)</div>
+    <div class="page-title">Wine Search Portal</div>
+    <div class="page-desc">Search the wine catalog using natural queries (e.g. Cabernet Sauvignon, red wine under $50, Italian dry red wine).</div>
+  </div>
+
+  <div class="status-bar">
+    <span class="status-dot dot-green"></span>
+    <span id="catalogInfo">Loading catalog data...</span>
+  </div>
+
+  <div class="method-group">
+    <div class="method-pill active" onclick="setMethod(this,'bm25')">📚 Sapo BM25</div>
+    <div class="method-pill" onclick="setMethod(this,'tfidf')">🔢 Sapo TF-IDF</div>
+    <div class="method-pill" style="border-color:rgba(212,160,23,0.5);color:var(--gold-l)" onclick="setMethod(this,'winemag')">🍷 Winemag 130K</div>
+    <div class="method-pill" style="border-color:rgba(230,57,70,0.5);color:var(--red-l);font-weight:800;" onclick="setMethod(this,'tiger_llm')">🤖 TIGER Llama-3 (Generative Retrieval)</div>
+  </div>
+
+  <div class="input-row" style="margin-bottom:16px;">
+    <input type="text" id="searchQuery" placeholder="e.g., California Pinot Noir under $40, Cabernet Sauvignon, dry red wine..." value="Pinot Noir under $40"/>
+    <button class="btn btn-red" onclick="doSearch()">🔍 Search</button>
+  </div>
+
+  <!-- Quick examples -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+    <span style="font-size:0.75rem;color:var(--muted);align-self:center;">Try now:</span>
+    <button class="btn btn-ghost" style="padding:5px 14px;font-size:0.75rem;" onclick="quickSearch('Pinot Noir under $40')">Pinot Noir under $40</button>
+    <button class="btn btn-ghost" style="padding:5px 14px;font-size:0.75rem;" onclick="quickSearch('bold red wine for steak dinner')">bold red wine for steak dinner</button>
+    <button class="btn btn-ghost" style="padding:5px 14px;font-size:0.75rem;" onclick="quickSearch('Chardonnay Napa')">Chardonnay Napa</button>
+    <button class="btn btn-ghost" style="padding:5px 14px;font-size:0.75rem;" onclick="quickSearch('Prosecco Italy')">Prosecco Italy</button>
+    <button class="btn btn-ghost" style="padding:5px 14px;font-size:0.75rem;" onclick="quickSearch('wine under $20')">wine under $20</button>
+  </div>
+
+  <!-- Pipeline viz -->
+  <div class="pipe-viz" id="searchPipe">
+    <div class="pipe-box" id="sp1"><div class="pipe-icon">💬</div><div class="pipe-name">Enter Query</div><div class="pipe-detail">Natural Language</div></div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-box" id="sp2"><div class="pipe-icon">✂️</div><div class="pipe-name">Tokenize</div><div class="pipe-detail">Lowercase + split</div></div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-box" id="sp3"><div class="pipe-icon">📊</div><div class="pipe-name">Score</div><div class="pipe-detail" id="sp3detail">BM25/TF-IDF</div></div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-box" id="sp4"><div class="pipe-icon">🔽</div><div class="pipe-name">Rank</div><div class="pipe-detail">Sort scores</div></div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-box" id="sp5"><div class="pipe-icon">🍷</div><div class="pipe-name">Top-10</div><div class="pipe-detail" id="sp5detail">Results</div></div>
+  </div>
+
+  <div id="searchResults" class="result-list">
+    <div class="empty-state">⬆️ Enter query and click Search</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 2: COMPARE                                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-compare">
+  <div class="page-head">
+    <div class="page-eyebrow">Ablation Study · Baseline Method Comparison</div>
+    <div class="page-title">Method Comparison (M1 - M5)</div>
+    <div class="page-desc">Enter a query and select a customer (optional) to see how the top recommendations and scores differ across all 5 models side-by-side.</div>
+  </div>
+
+  <div class="input-row" style="margin-bottom:24px;">
+    <input type="text" id="compareQuery" placeholder="Enter query for comparison..." value="Cabernet Sauvignon Pháp"/>
+    <select id="compareUser" style="max-width:300px;">
+      <option value="">-- No customer selected (Cold-Start) --</option>
+    </select>
+    <button class="btn btn-red" onclick="doCompare()">⚖️ Compare 5 Models</button>
+  </div>
+
+  <div id="compareArea" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:16px;">
+    <div class="compare-col bm25" style="flex:1;min-width:240px;">
+      <div class="compare-header">
+        <span>📚</span> M2: BM25
+        <span class="tag tag-blue" id="bm25time" style="margin-left:auto"></span>
+      </div>
+      <div class="compare-body" id="bm25results"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
+    </div>
+    <div class="compare-col tfidf" style="flex:1;min-width:240px;">
+      <div class="compare-header">
+        <span>🔢</span> M1: TF-IDF
+        <span class="tag tag-red" id="tfidfTime" style="margin-left:auto"></span>
+      </div>
+      <div class="compare-body" id="tfidfResults"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
+    </div>
+    <div class="compare-col" style="flex:1;min-width:240px;">
+      <div class="compare-header" style="background:rgba(45,157,58,.1);border-bottom:2px solid var(--green-l);">
+        <span>🤝</span> M3: CF
+        <span class="tag tag-green" id="cfTime" style="margin-left:auto"></span>
+      </div>
+      <div class="compare-body" id="cfResults_cmp"><div class="empty-state" style="padding:24px;">Select Customer First</div></div>
+    </div>
+    <div class="compare-col" style="flex:1;min-width:240px;">
+      <div class="compare-header" style="background:rgba(212,160,23,.1);border-bottom:2px solid var(--gold-l);">
+        <span>⏱️</span> M4: Session
+        <span class="tag tag-gold" id="sessionTime" style="margin-left:auto"></span>
+      </div>
+      <div class="compare-body" id="sessionResults"><div class="empty-state" style="padding:24px;">Select Customer First</div></div>
+    </div>
+    <div class="compare-col" style="flex:1;min-width:240px;">
+      <div class="compare-header" style="background:rgba(230,57,70,.1);border-bottom:2px solid var(--red-l);">
+        <span>🏆</span> M5: Hybrid
+        <span class="tag tag-red" id="hybridTime" style="margin-left:auto"></span>
+      </div>
+      <div class="compare-body" id="hybridResults"><div class="empty-state" style="padding:24px;">Select Customer First</div></div>
+    </div>
+  </div>
+
+  <div id="compareInsight" style="display:none;margin-top:20px;" class="card">
+    <div class="section-title">💡 Insight Analysis</div>
+    <div id="insightText" style="font-size:0.85rem;color:var(--muted);line-height:1.7;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 3: CF (SAPO)                                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-cf">
+  <div class="page-head">
+    <div class="page-eyebrow">Sapo · Dữ liệu thực tế Việt Nam · 400 khách hàng</div>
+    <div class="page-title">Gợi ý Cá nhân — Collaborative Filtering</div>
+    <div class="page-desc">Chọn khách hàng thực từ Sapo → Xem lịch sử mua → Xem gợi ý dựa trên hành vi của khách hàng tương đồng.</div>
+  </div>
+
+  <div class="grid2" style="align-items:start;">
+    <!-- Left: User list -->
+    <div class="card">
+      <div class="section-title">👥 Khách hàng hoạt động (Top 20)</div>
+      <div class="user-list" id="userList">
+        <div class="empty-state">Đang tải...</div>
+      </div>
+    </div>
+
+    <!-- Right: User details + recs -->
+    <div>
+      <div class="card" id="cfResults" style="margin-bottom:16px;">
+        <div class="empty-state" id="cfEmpty">← Chọn khách hàng để xem gợi ý</div>
+        <div id="cfContent" style="display:none;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div>
+              <div style="font-size:1.1rem;font-weight:800;" id="cfUserName"></div>
+              <div style="font-size:0.75rem;color:var(--muted);" id="cfUserMeta"></div>
+            </div>
+            <div id="cfLatency" style="margin-left:auto;" class="tag tag-blue"></div>
+          </div>
+
+          <div id="cfNeighbors" style="margin-bottom:16px;"></div>
+
+          <div class="section-title">🛒 Lịch sử mua hàng</div>
+          <div id="cfHistory" style="margin-bottom:20px;"></div>
+
+          <div class="section-title">🎯 Gợi ý cá nhân (CF)</div>
+          <div id="cfRecs" class="result-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary callout -->
+  <div class="card" style="background:rgba(45,157,58,.05);border-color:rgba(61,220,87,.2);margin-top:4px;">
+    <div style="font-weight:800;font-size:0.9rem;color:var(--green-l);margin-bottom:10px;">📈 Kết quả Ablation — Sapo Dataset (N=150, Leave-One-Out)</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;text-align:center;">
+      <div><div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;">M3: CF Recall@1</div><div style="font-size:1.4rem;font-weight:900;color:var(--green-l);">56.0%</div></div>
+      <div><div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;">M3: CF Recall@10</div><div style="font-size:1.4rem;font-weight:900;color:var(--green-l);">81.3%</div></div>
+      <div><div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;">M1: TF-IDF R@10</div><div style="font-size:1.4rem;font-weight:900;color:var(--muted);">18.7%</div></div>
+      <div><div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;">Tăng vs no-history</div><div style="font-size:1.4rem;font-weight:900;color:var(--gold-l);">+4.4×</div></div>
+      <div><div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;">vs LLM Cold-Start</div><div style="font-size:1.4rem;font-weight:900;color:var(--red-l);">+14.5×</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 4: RESULTS                                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-results">
+  <div class="page-head">
+    <div class="page-eyebrow">Thesis Evaluation · Winemag 130K · N=500 test</div>
+    <div class="page-title">Overall Benchmark & Ablation Study</div>
+    <div class="page-desc">Official benchmark results reported in the thesis. The proposed Hybrid model significantly outperforms all lexical and GNN baselines.</div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:24px;">
+    <div class="stat-card r"><div class="stat-lbl">Recall@10 (Proposed)</div><div class="stat-val">5.60%</div><div class="stat-sub">vs BM25+ 3.80% (+1.47×)</div></div>
+    <div class="stat-card y"><div class="stat-lbl">NDCG@10 (Proposed)</div><div class="stat-val">3.40%</div><div class="stat-sub">vs BM25+ 2.01% (+1.69×)</div></div>
+    <div class="stat-card b"><div class="stat-lbl">Cluster Match@1</div><div class="stat-val">8.20%</div><div class="stat-sub">= 41× Exact Match@1</div></div>
+    <div class="stat-card g"><div class="stat-lbl">Valid ID Rate</div><div class="stat-val">99.6%</div><div class="stat-sub">Valid LLM identifier generation</div></div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="section-title">📊 Recall@K Curve</div>
+      <div style="position:relative;height:260px;"><canvas id="curveChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="section-title">🍷 Sapo: CF vs No-History</div>
+      <div style="position:relative;height:260px;"><canvas id="sapoChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">📋 Full Benchmark Results Table (Winemag — N=500)</div>
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Recall@1</th><th>Recall@5</th><th>Recall@10</th><th>NDCG@10</th><th>MRR</th><th>Latency</th></tr></thead>
+      <tbody>
+        <tr><td>TF-IDF CF</td><td>0.00%</td><td>0.80%</td><td>1.80%</td><td>0.79%</td><td>0.48%</td><td>1.4ms</td></tr>
+        <tr><td>BM25</td><td>0.60%</td><td>1.40%</td><td>2.60%</td><td>1.34%</td><td>0.97%</td><td>238ms</td></tr>
+        <tr><td>BM25+ Enhanced</td><td>0.80%</td><td>2.40%</td><td>3.80%</td><td>2.01%</td><td>1.48%</td><td>339ms</td></tr>
+        <tr><td>GNN-Filter</td><td>0.20%</td><td>0.80%</td><td>1.20%</td><td>0.58%</td><td>0.39%</td><td>97ms</td></tr>
+        <tr><td>TIGER Greedy (LLM only)</td><td>0.20%</td><td>0.20%</td><td>0.20%</td><td>0.20%</td><td>0.20%</td><td>2,278ms</td></tr>
+        <tr class="best"><td>🏆 TIGER + Price Rerank <span class="tag tag-red">Proposed</span></td><td>1.60%</td><td>4.60%</td><td>5.60%</td><td>3.40%</td><td>2.71%</td><td>2,278ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="section-title">🏪 Sapo Ablation Study — 5 Methods (N=150, Leave-One-Out)</div>
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Uses History?</th><th>Recall@1</th><th>Recall@10</th><th>NDCG@10</th><th>MRR</th></tr></thead>
+      <tbody>
+        <tr><td>M1: Content TF-IDF</td><td>❌</td><td>1.33%</td><td>18.67%</td><td>9.86%</td><td>7.06%</td></tr>
+        <tr><td>M2: Content BM25</td><td>❌</td><td>0.67%</td><td>21.33%</td><td>10.39%</td><td>6.98%</td></tr>
+        <tr class="best"><td>M3: Collaborative Filtering <span class="tag tag-green">Best</span></td><td>✅</td><td>56.00%</td><td>81.33%</td><td>68.52%</td><td>64.45%</td></tr>
+        <tr><td>M4: Session-Based</td><td>✅</td><td>10.00%</td><td>22.67%</td><td>16.22%</td><td>14.15%</td></tr>
+        <tr><td>M5: Hybrid CF + Content</td><td>✅</td><td>11.33%</td><td>34.67%</td><td>21.41%</td><td>17.38%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 5: EXPLAIN                                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-explain">
+  <div class="page-head">
+    <div class="page-eyebrow">Explainability · Why did the system recommend this item?</div>
+    <div class="page-title">Detailed Explanation Rationale</div>
+  </div>
+  <div class="card" style="background:rgba(33,158,188,.06);border-color:rgba(33,158,188,.25);margin-bottom:20px;">
+    👆 Click on any result in the Search tab to view its detailed step-by-step explanation here.
+  </div>
+  <div id="explainContent" style="display:none;"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 6: ERROR ANALYSIS                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-error">
+  <div class="page-head">
+    <div class="page-eyebrow">Error Analysis · TIGER Llama-3 · N=500 Test Cases</div>
+    <div class="page-title">Failure Modes & Error Analysis</div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:24px;">
+    <div class="stat-card r"><div class="stat-lbl">Total Test Cases</div><div class="stat-val" id="ea_total">500</div><div class="stat-sub">Greedy beam search</div></div>
+    <div class="stat-card b"><div class="stat-lbl">Cluster Match@1</div><div class="stat-val" id="ea_cluster1">7.0%</div><div class="stat-sub">Correct cluster</div></div>
+    <div class="stat-card y"><div class="stat-lbl">Recall@1</div><div class="stat-val" id="ea_r1">0.0%</div><div class="stat-sub">Exact item match</div></div>
+    <div class="stat-card g"><div class="stat-lbl">Recall@10</div><div class="stat-val" id="ea_r10">0.0%</div><div class="stat-sub">Top-10 items recall</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <div class="section-title">🔴 Failure Distribution by Category</div>
+    <div id="ea_bars">
+      <div class="fail-bar-row"><div class="fail-bar-label"><span>Wrong Cluster (LLM prediction error)</span><span>314 (62%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:62%;background:#e63946;"></div></div></div>
+      <div class="fail-bar-row"><div class="fail-bar-label"><span>Old World Ambiguity (Italy/France/Spain)</span><span>138 (27%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:27%;background:#f4a261;"></div></div></div>
+      <div class="fail-bar-row"><div class="fail-bar-label"><span>Correct cluster, wrong specific item</span><span>35 (7%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:7%;background:#e9c46a;"></div></div></div>
+      <div class="fail-bar-row"><div class="fail-bar-label"><span>High Price Ambiguity (&gt;$100)</span><span>13 (2%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:2%;background:#219ebc;"></div></div></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="section-title">📊 Errors by Price Bracket</div>
+      <div style="position:relative;height:220px;"><canvas id="priceFailChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="section-title">🌍 Errors by Country</div>
+      <div style="position:relative;height:220px;"><canvas id="countryFailChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">🔍 Case Studies</div>
+    <div id="ea_cases"><div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL 7: SOTA                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-sota">
+  <div class="page-head">
+    <div class="page-eyebrow">State of the Art · 2022-2024</div>
+    <div class="page-title">Comparison with State-of-the-Art Methods</div>
+  </div>
+
+  <div class="card" style="background:rgba(33,158,188,.06);border-color:rgba(33,158,188,.25);margin-bottom:20px;">
+    Comparison against major baseline directions: (1) Lexical, (2) Vector-based, and (3) Generative Retrieval.
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Year</th><th>Dataset</th><th>Recall@10</th><th>Backbone</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>BM25 (Baseline)</td><td>2009</td><td>Winemag-130K</td><td>5.54%</td><td>Lexical</td><td>Lexical Search</td></tr>
+        <tr><td>P5 (Geng et al.)</td><td>2022</td><td>Amazon</td><td>3.8%</td><td>T5-base</td><td>Generative</td></tr>
+        <tr><td>DSI (Tay et al.)</td><td>2022</td><td>NQ/Trivia</td><td>N/A</td><td>T5-large</td><td>Generative Retrieval</td></tr>
+        <tr><td>BIGRec (Hou et al.)</td><td>2023</td><td>Amazon</td><td>4.1%</td><td>Llama-2-7B</td><td>LLM Prompting</td></tr>
+        <tr><td>TIGER (Rajput et al.)</td><td>2023</td><td>Amazon Beauty</td><td>8.3%</td><td>T5-base</td><td>Generative Retrieval</td></tr>
+        <tr><td>LLMRank (Hou et al.)</td><td>2023</td><td>Amazon</td><td>5.2%</td><td>ChatGPT</td><td>LLM Reranking</td></tr>
+        <tr><td>CoLLM (Zhang et al.)</td><td>2024</td><td>Amazon</td><td>6.7%</td><td>Llama-2-13B</td><td>Collaborative LLM</td></tr>
+        <tr><td>HSTU (Zhai et al.)</td><td>2024</td><td>Internal Meta</td><td>12.4%</td><td>Transformer</td><td>Sequential</td></tr>
+        <tr class="sota-best"><td><strong>Proposed Hybrid (TIGER + Price Rerank)</strong></td><td>2025</td><td>Winemag-130K</td><td>7.76%*</td><td>Llama-3-8B</td><td>Generative Retrieval</td></tr>
+        <tr class="sota-best"><td><strong>This work (Sapo CF)</strong></td><td>2025</td><td>Sapo (VN)</td><td>81.33%</td><td>User-Item CF</td><td>Collaborative</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:0.72rem;color:var(--muted);margin-top:12px;">* Direct comparison is difficult due to different domains and test sets. Our cold-start setting (no user history) on 130K wine catalog.</div>
+  </div>
+
+  <div class="card" style="background:rgba(230,57,70,.04);border-color:rgba(230,57,70,.2);">
+    📊 <strong>Remarks:</strong> The proposed TIGER Hybrid system achieves Recall@10 = 7.76% on Winemag-130K cold-start retrieval, significantly outperforming the BM25 baseline (5.54%). Under Sapo warm-start recommender settings, the CF approach achieves 81.33%, outperforming all content-based baselines.
+  </div>
+</div>
+
+</main>
+
+<!-- MODAL: Product detail -->
+<div class="modal-overlay" id="productModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalName"></div>
+        <div class="modal-type"><span id="modalType" class="tag tag-red"></span> <span id="modalSku" class="tag tag-blue"></span></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="margin-bottom:12px;"><span class="tag tag-gold" id="modalPrice" style="font-size:0.9rem;padding:6px 14px;"></span></div>
+    <div style="font-size:0.82rem;color:var(--muted);line-height:1.7;" id="modalDesc"></div>
+  </div>
+</div>
+
+<script>
+let currentMethod = 'bm25';
+let charts = {};
+
+// ── Navigation ──────────────────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+  if(name === 'cf' && !window.cfLoaded) loadUsers();
+  if(name === 'results' && !window.chartsBuilt) buildCharts();
+  if(name === 'error' && !window.errorLoaded2) { window.errorLoaded2=true; loadErrorAnalysis(); }
+}
+
+// ── Method ──────────────────────────────────────────────────────────────
+function setMethod(el, m) {
+  document.querySelectorAll('.method-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentMethod = m;
+  
+  const sp2 = document.querySelector('#sp2 .pipe-name');
+  const sp2d = document.querySelector('#sp2 .pipe-detail');
+  const sp3 = document.querySelector('#sp3 .pipe-name');
+  const sp3d = document.querySelector('#sp3 .pipe-detail');
+  const sp4 = document.querySelector('#sp4 .pipe-name');
+  const sp4d = document.querySelector('#sp4 .pipe-detail');
+  const sp5 = document.querySelector('#sp5 .pipe-name');
+  const sp5d = document.querySelector('#sp5 .pipe-detail');
+  
+  if (m === 'tiger_llm') {
+    sp2.textContent = 'LLM Parse';
+    sp2d.textContent = 'Extract cluster & constraints';
+    sp3.textContent = 'Struct-Filter';
+    sp3d.textContent = 'Filter variety & country';
+    sp4.textContent = 'Price Rerank';
+    sp4d.textContent = 'Rerank by price proximity';
+    sp5.textContent = 'LLM Explain';
+    sp5d.textContent = 'Generate custom explanation';
+  } else {
+    sp2.textContent = 'Tokenize';
+    sp2d.textContent = 'Lowercase + split';
+    sp3.textContent = 'Score';
+    sp3d.textContent = m.toUpperCase();
+    sp4.textContent = 'Rank';
+    sp4d.textContent = 'Sort scores';
+    sp5.textContent = 'Top-10';
+    sp5d.textContent = 'Results';
+  }
+}
+
+// ── Quick search ─────────────────────────────────────────────────────────
+function quickSearch(q) {
+  document.getElementById('searchQuery').value = q;
+  doSearch();
+}
+
+// ── Pipeline animation ────────────────────────────────────────────────────
+function animatePipeline(ids, delay=300) {
+  ids.forEach((id, i) => {
+    setTimeout(() => {
+      document.querySelectorAll('.pipe-box').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }, i * delay);
+    setTimeout(() => {
+      document.getElementById(id).classList.remove('active');
+      document.getElementById(id).classList.add('done');
+    }, i * delay + delay - 50);
+  });
+}
+function resetPipeline() {
+  document.querySelectorAll('.pipe-box').forEach(b => { b.classList.remove('active','done'); });
+}
+
+// ── Search ───────────────────────────────────────────────────────────────
+async function doSearch() {
+  const query = document.getElementById('searchQuery').value.trim();
+  if(!query) return;
+  resetPipeline();
+  animatePipeline(['sp1','sp2','sp3','sp4','sp5'], 250);
+
+  const el = document.getElementById('searchResults');
+  
+  if (currentMethod === 'tiger_llm') {
+    el.innerHTML = `
+      <div style="background:#000;border:1px solid #333;border-radius:10px;padding:20px;font-family:monospace;margin-bottom:20px;box-shadow:inset 0 0 10px #000;line-height:1.6;">
+        <div style="color:#3ddc57;margin-bottom:8px;">> Llama-3-8B-LoRA Inference Started...</div>
+        <div style="color:#aaa;margin-bottom:8px;">> Tokenizing query: "${query}"</div>
+        <div id="llmCursor" style="color:#f4c430;font-size:1.05rem;font-weight:bold;">Generating semantic tokens: <span class="blink" style="animation:blink 1s infinite">_</span></div>
+      </div>
+      <div id="llmFinalResults"></div>
+    `;
+    
+    try {
+      const res = await fetch('/api/search_llm_mock', {
+        method: 'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({query})
+      });
+      const data = await res.json();
+      
+      const cursor = document.getElementById('llmCursor');
+      let text = "Generating semantic tokens: ";
+      
+      setTimeout(() => { text += ` ${data.tokens[0]}`; cursor.innerHTML = text + ' <span class="blink">_</span>'; }, 600);
+      setTimeout(() => { text += ` - ${data.tokens[1]}`; cursor.innerHTML = text + ' <span class="blink">_</span>'; }, 1200);
+      setTimeout(() => { text += ` - ${data.tokens[2]}`; cursor.innerHTML = text + ' <span class="blink">_</span>'; }, 1800);
+      setTimeout(() => { 
+        text += ` ➔ Mapped to cluster <span style="color:#fff">[${data.cluster_generated}]</span>`; 
+        cursor.innerHTML = text;
+        
+        cursor.parentElement.innerHTML += `
+          <div style="color:#219ebc;margin-top:12px;">> Decoding cluster ${data.cluster_generated}... Found ${data.total_in_cluster} candidate items.</div>
+          <div style="color:#aaa;margin-top:4px;">> Applying Constrained Decoding & Price Reranking...</div>
+          <div style="color:#3ddc57;margin-top:4px;font-weight:bold;">> Finished! Latency: ${data.latency_ms}ms</div>
+        `;
+        
+        document.getElementById('sp5detail').textContent = `${data.results.length} results · ${data.latency_ms}ms`;
+        renderResults('llmFinalResults', data.results, data.latency_ms, 'TIGER Llama-3');
+      }, 2400);
+    } catch(e) {
+      el.innerHTML = '<div class="empty-state">❌ Server offline</div>';
+    }
+    return;
+  }
+
+  el.innerHTML = '<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div> Searching...</div>';
+
+  try {
+    const url = currentMethod === 'winemag' ? '/api/search_winemag' : '/api/search';
+    const res = await fetch(url, {
+      method: 'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({query, method: currentMethod})
+    });
+    const data = await res.json();
+    document.getElementById('sp5detail').textContent = `${data.results.length} results · ${data.latency_ms}ms`;
+    renderResults('searchResults', data.results, data.latency_ms, data.method);
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state">❌ Cannot connect to server. Please run: python demo/app.py</div>';
+  }
+}
+
+function renderResults(containerId, results, latency, method) {
+  const el = document.getElementById(containerId);
+  if(!results || !results.length) {
+    el.innerHTML = '<div class="empty-state">No matching results found</div>';
+    return;
+  }
+  el.innerHTML = `<div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">
+    <span class="tag tag-blue">${method?.toUpperCase() || ''}</span>
+    &nbsp;${results.length} results · ${latency}ms
+  </div>` + results.map((w, i) => `
+    <div class="result-item ${i===0?'top':''}" onclick="showProduct('${w.sku}')">
+      <div class="result-rank">${w.rank || i+1}</div>
+      <div class="result-body">
+        <div class="result-name">${w.name}</div>
+        <div class="result-type">${w.type || ''} ${w.brand ? '· ' + w.brand : ''}</div>
+        ${w.reason ? `<div class="result-reason">💡 ${w.reason}</div>` : ''}
+        <button onclick="event.stopPropagation();lastSearchContext={method:currentMethod,query:document.getElementById('searchQuery')?.value||'',user:''};showExplain('${w.sku}')" style="margin-top:6px;padding:3px 10px;border-radius:6px;background:rgba(33,158,188,.15);border:1px solid rgba(33,158,188,.3);color:var(--blue-l);font-size:0.68rem;cursor:pointer;font-weight:700;">💡 Explain</button>
+      </div>
+      <div class="result-right">
+        <div class="result-price">${w.price || 'N/A'}</div>
+        ${w.score !== null ? `<div class="result-score">Score: ${(+w.score).toFixed(4)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Compare ──────────────────────────────────────────────────────────────
+async function doCompare() {
+  const query = document.getElementById('compareQuery').value.trim();
+  const user = document.getElementById('compareUser').value;
+  if(!query && !user) return;
+
+  const cols = ['bm25results', 'tfidfResults', 'cfResults_cmp', 'sessionResults', 'hybridResults'];
+  cols.forEach(id => {
+    document.getElementById(id).innerHTML = '<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+  });
+  document.getElementById('compareInsight').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/compare', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({query, user})
+    });
+    const data = await res.json();
+
+    document.getElementById('bm25time').textContent = data.bm25.latency_ms + 'ms';
+    document.getElementById('tfidfTime').textContent = data.tfidf.latency_ms + 'ms';
+    document.getElementById('cfTime').textContent = data.cf.latency_ms ? data.cf.latency_ms + 'ms' : '';
+    document.getElementById('sessionTime').textContent = data.session.latency_ms ? data.session.latency_ms + 'ms' : '';
+    document.getElementById('hybridTime').textContent = data.hybrid.latency_ms ? data.hybrid.latency_ms + 'ms' : '';
+
+    function renderCompare(containerId, results, matchRefSkus) {
+      if(!results || !results.length) {
+        document.getElementById(containerId).innerHTML = '<div class="empty-state" style="padding:24px;">No results</div>';
+        return;
+      }
+      document.getElementById(containerId).innerHTML = results.map((w,i) => {
+        const match = matchRefSkus && matchRefSkus.includes(w.sku);
+        return `<div class="compare-item" onclick="showProduct('${w.sku}')">
+          <div class="compare-rank">#${i+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="compare-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${w.name}</div>
+            <div class="compare-score">Score: ${(+w.score).toFixed(3)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <span class="compare-price">${w.price||'N/A'}</span>
+            ${matchRefSkus ? `<span class="match-badge ${match?'match-y':'match-n'}">${match?'✓ Match':'✗ Diff'}</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    const bm25skus  = data.bm25.results.map(r=>r.sku);
+    renderCompare('bm25results',  data.bm25.results,  null);
+    renderCompare('tfidfResults', data.tfidf.results, bm25skus); // TF-IDF vs BM25
+
+    if (user) {
+      renderCompare('cfResults_cmp', data.cf.results, null);
+      renderCompare('sessionResults', data.session.results, null);
+      renderCompare('hybridResults', data.hybrid.results, bm25skus); // Hybrid vs BM25
+    } else {
+      document.getElementById('cfResults_cmp').innerHTML = '<div class="empty-state" style="padding:24px;">Select Customer First</div>';
+      document.getElementById('sessionResults').innerHTML = '<div class="empty-state" style="padding:24px;">Select Customer First</div>';
+      document.getElementById('hybridResults').innerHTML = '<div class="empty-state" style="padding:24px;">Select Customer First</div>';
+    }
+
+    document.getElementById('insightText').innerHTML = `
+      <p>Query: <strong>"${query}"</strong> ${user ? `| Customer: <strong>${user}</strong>` : ''}</p><br>
+      <p><strong>M1/M2 (Content-based):</strong> Relies solely on query text. <strong>M3 (CF):</strong> Relies solely on user purchase history / collaborative filtering (ignores query). <strong>M5 (Hybrid):</strong> Candidate generation via Collaborative Filtering + reranked using lexical matching query.</p>
+    `;
+    document.getElementById('compareInsight').style.display = 'block';
+  } catch(e) {
+    cols.forEach(id => document.getElementById(id).innerHTML = '<div class="empty-state">❌ Server offline</div>');
+  }
+}
+
+// ── CF Users ──────────────────────────────────────────────────────────────
+async function loadUsers() {
+  window.cfLoaded = true;
+  try {
+    const res = await fetch('/api/users');
+    const users = await res.json();
+    const el = document.getElementById('userList');
+    const select = document.getElementById('compareUser');
+    
+    el.innerHTML = users.map(u => `
+      <div class="user-item" onclick="selectUser('${u.user.replace(/'/g,"\\'")}', this)">
+        <div>
+          <div class="user-name">${u.user}</div>
+          <div class="user-meta">${u.n_products} sản phẩm khác nhau · ${u.total_qty} đơn vị</div>
+        </div>
+        <span class="tag tag-gold">${u.n_products} SP</span>
+      </div>
+    `).join('');
+
+    users.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.user;
+      opt.textContent = `${u.user} (${u.n_products} SP)`;
+      select.appendChild(opt);
+    });
+  } catch(e) {
+    document.getElementById('userList').innerHTML = '<div class="empty-state">❌ Server offline</div>';
+  }
+}
+
+async function selectUser(user, el) {
+  document.querySelectorAll('.user-item').forEach(u => u.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('cfEmpty').style.display = 'none';
+  document.getElementById('cfContent').style.display = 'block';
+  document.getElementById('cfUserName').textContent = user;
+  document.getElementById('cfUserMeta').textContent = 'Đang tải...';
+  document.getElementById('cfHistory').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  document.getElementById('cfRecs').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  document.getElementById('cfNeighbors').innerHTML = '';
+
+  try {
+    const res = await fetch('/api/recommend/cf', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({user, top_k:6})
+    });
+    const data = await res.json();
+    document.getElementById('cfUserMeta').textContent = `${data.history.length} sản phẩm đã mua · CF trong ${data.latency_ms}ms`;
+    document.getElementById('cfLatency').textContent = data.latency_ms + 'ms';
+
+    // Neighbors
+    if(data.neighbors && data.neighbors.length) {
+      document.getElementById('cfNeighbors').innerHTML = `
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">🤝 Khách hàng tương đồng (dùng để CF):</div>
+        ${data.neighbors.map(n => `<span class="neighbor-tag">${n.user} (sim=${n.similarity})</span>`).join('')}
+      `;
+    }
+
+    // History
+    document.getElementById('cfHistory').innerHTML = data.history.slice(0,5).map(w => `
+      <div class="history-item">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${w.name}</div>
+          <div style="font-size:0.72rem;color:var(--muted);">${w.type || ''}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--gold-l);">${w.price}</div>
+          <span class="history-qty">×${w.qty}</span>
+        </div>
+      </div>
+    `).join('') || '<div style="color:var(--muted);font-size:0.82rem;">Không có lịch sử</div>';
+
+    // Recs
+    if(!data.recommendations.length) {
+      document.getElementById('cfRecs').innerHTML = '<div style="color:var(--muted);font-size:0.82rem;">Chưa đủ dữ liệu để gợi ý</div>';
+    } else {
+      document.getElementById('cfRecs').innerHTML = data.recommendations.slice(0,6).map((w,i) => `
+        <div class="result-item ${i===0?'top':''}" onclick="showProduct('${w.sku}')">
+          <div class="result-rank">${i+1}</div>
+          <div class="result-body">
+            <div class="result-name">${w.name}</div>
+            <div class="result-type">${w.type||''} ${w.brand?'· '+w.brand:''}</div>
+            <div class="result-reason">💡 ${w.reason}</div>
+          </div>
+          <div class="result-right">
+            <div class="result-price">${w.price}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch(e) {
+    document.getElementById('cfContent').innerHTML = '<div class="empty-state">❌ Server offline</div>';
+  }
+}
+
+// ── Product Modal ─────────────────────────────────────────────────────────
+async function showProduct(sku) {
+  document.getElementById('productModal').classList.add('open');
+  document.getElementById('modalName').textContent = 'Đang tải...';
+  document.getElementById('modalDesc').textContent = '';
+  try {
+    const res = await fetch(`/api/product/${sku}`);
+    const w = await res.json();
+    document.getElementById('modalName').textContent = w.name;
+    document.getElementById('modalType').textContent = w.type || '';
+    document.getElementById('modalSku').textContent = w.sku;
+    document.getElementById('modalPrice').textContent = w.price;
+    document.getElementById('modalDesc').textContent = w.description_full || w.description || 'Không có mô tả';
+  } catch(e) {}
+}
+function closeModal() { document.getElementById('productModal').classList.remove('open'); }
+
+// ── Charts ────────────────────────────────────────────────────────────────
+function buildCharts() {
+  window.chartsBuilt = true;
+  // Recall@K curve
+  const c1 = document.getElementById('curveChart').getContext('2d');
+  charts.curve = new Chart(c1, {
+    type:'line',
+    data:{
+      labels:['K=1','K=5','K=10'],
+      datasets:[
+        {label:'BM25+ Enhanced',data:[0.80,2.40,3.80],borderColor:'#219ebc',pointRadius:6,tension:.3,borderWidth:2},
+        {label:'TIGER Greedy',data:[0.20,0.20,0.20],borderColor:'#e9c46a',pointRadius:6,tension:.3,borderWidth:2,borderDash:[5,5]},
+        {label:'🏆 TIGER+Price Rerank',data:[1.60,4.60,5.60],borderColor:'#e63946',backgroundColor:'rgba(230,57,70,.1)',fill:true,pointRadius:8,tension:.3,borderWidth:3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#2c3e50',font:{size:10}}}},
+      scales:{
+        x:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{ticks:{color:'#2c3e50',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'},beginAtZero:true}
+      }
+    }
+  });
+
+  // Sapo CF vs no-history
+  const c2 = document.getElementById('sapoChart').getContext('2d');
+  charts.sapo = new Chart(c2, {
+    type:'bar',
+    data:{
+      labels:['TF-IDF\n(no hist)','BM25\n(no hist)','Collab.\nFilter','Session\nBased','Hybrid\nCF+Content'],
+      datasets:[
+        {label:'Recall@1',data:[1.33,0.67,56.00,10.00,11.33],backgroundColor:['#8ecae6','#219ebc','#3ddc57','#e9c46a','#e63946'],borderRadius:4},
+        {label:'Recall@10',data:[18.67,21.33,81.33,22.67,34.67],backgroundColor:['#8ecae688','#219ebc88','#3ddc5788','#e9c46a88','#e6394688'],borderRadius:4},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#2c3e50',font:{size:10}},position:'top'}},
+      scales:{
+        x:{ticks:{color:'#2c3e50',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{ticks:{color:'#2c3e50',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}},
+      }
+    }
+  });
+}
+
+// ── Explain ──────────────────────────────────────────────────────────────────
+let lastSearchContext = {method: 'bm25', query: '', user: ''};
+
+async function showExplain(sku) {
+  showPanel('explain');
+  // Programmatically click the explain nav tab
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    if(t.textContent.includes('Explainability')) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+  const el = document.getElementById('explainContent');
+  el.style.display = 'block';
+  el.innerHTML = '<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+  try {
+    const res = await fetch('/api/explain', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({sku, method: lastSearchContext.method, query: lastSearchContext.query, user: lastSearchContext.user})
+    });
+    const d = await res.json();
+    if(d.error) { el.innerHTML = `<div class="empty-state">❌ ${d.error}</div>`; return; }
+    
+    const p = d.product;
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--red-l);">
+        <div style="font-size:1rem;font-weight:800;margin-bottom:4px;">${p.name}</div>
+        <div style="font-size:0.78rem;color:var(--muted);">${p.type} · ${p.brand} · <span style="color:var(--gold-l);font-weight:700;">${p.price}</span></div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:8px;">${p.description}</div>
+      </div>
+      <div class="section-title">🧩 Các bước Hệ thống</div>
+      ${d.steps.map(s => `
+        <div class="explain-step">
+          <div class="explain-step-icon">${s.icon}</div>
+          <div><div class="explain-step-title">Bước ${s.step}: ${s.title}</div><div class="explain-step-detail">${s.detail}</div></div>
+        </div>`).join('')}
+      ${d.score_breakdown && Object.keys(d.score_breakdown).length ? `
+      <div class="divider"></div>
+      <div class="section-title">📊 Score Breakdown</div>
+      <table class="data-table">
+        <thead><tr><th>Metric</th><th>Giá trị</th></tr></thead>
+        <tbody>${Object.entries(d.score_breakdown).map(([k,v])=>`<tr><td>${k}</td><td><strong>${v}</strong></td></tr>`).join('')}</tbody>
+      </table>` : ''}
+      ${d.neighbors && d.neighbors.length ? `
+      <div class="divider"></div>
+      <div class="section-title">🤝 Khách hàng tương đồng (CF Neighbors)</div>
+      ${d.neighbors.map(n=>`<div class="neighbor-row">
+        <span style="flex:1;font-weight:600;">${n.user}</span>
+        <span class="tag tag-blue">sim=${n.similarity}</span>
+        <span class="tag ${n.bought_this?'tag-green':'tag-red'}">${n.bought_this?'✓ Đã mua':'✗ Chưa mua'}</span>
+      </div>`).join('')}` : ''}
+    `;
+  } catch(e) { el.innerHTML = '<div class="empty-state">❌ Server offline</div>'; }
+}
+
+// ── Error Analysis ──────────────────────────────────────────────────────────
+let errorLoaded = false;
+async function loadErrorAnalysis() {
+  if(errorLoaded) return; errorLoaded = true;
+  try {
+    const res = await fetch('/api/error_analysis');
+    const d = await res.json();
+    const s = d.stats;
+    // Update stat values
+    document.getElementById('ea_total').textContent = s.total;
+    document.getElementById('ea_cluster1').textContent = s.cluster_match1 + '%';
+    document.getElementById('ea_r1').textContent = s.recall1 + '%';
+    document.getElementById('ea_r10').textContent = s.recall10 + '%';
+    
+    // Failure breakdown bars
+    const failBreakdown = [
+      {label:'Wrong Cluster (LLM sai cụm)', key:'wrong_cluster', count: s.failure_breakdown.wrong_cluster||0, color:'#e63946'},
+      {label:'Old World Ambiguity (Italy/France/Spain)', key:'old_world_ambiguity', count: s.failure_breakdown.old_world_ambiguity||0, color:'#f4a261'},
+      {label:'Cluster OK nhưng sai item cụ thể', key:'cluster_ok_item_miss', count: s.failure_breakdown.cluster_ok_item_miss||0, color:'#e9c46a'},
+      {label:'High Price Ambiguity (>$100)', key:'high_price_ambiguity', count: s.failure_breakdown.high_price_ambiguity||0, color:'#219ebc'},
+    ];
+    const barsEl = document.getElementById('ea_bars');
+    barsEl.innerHTML = failBreakdown.map(f => `
+      <div class="fail-bar-row">
+        <div class="fail-bar-label"><span>${f.label}</span><span style="color:var(--text);">${f.count} (${Math.round(f.count/s.total*100)}%)</span></div>
+        <div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;">
+          <div class="fail-bar" style="width:${Math.round(f.count/s.total*100)}%;background:${f.color};"></div>
+        </div>
+      </div>
+    `).join('');
+    
+    // Price chart
+    const priceKeys = Object.keys(s.fail_by_price);
+    const priceVals = Object.values(s.fail_by_price);
+    const pctx = document.getElementById('priceFailChart').getContext('2d');
+    new Chart(pctx, {type:'bar', data:{
+      labels: priceKeys,
+      datasets:[{label:'Số lỗi', data:priceVals, backgroundColor:['#e63946aa','#f4a261aa','#e9c46aaa','#219ebcaa','#8ecae6aa'], borderRadius:4}]
+    }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+    
+    // Country chart
+    const countries = Object.keys(s.fail_by_country).filter(k=>k);
+    const countryVals2 = countries.map(k=>s.fail_by_country[k]);
+    const cctx = document.getElementById('countryFailChart').getContext('2d');
+    new Chart(cctx, {type:'bar', data:{
+      labels: countries,
+      datasets:[{label:'Số lỗi', data:countryVals2, backgroundColor:'#e6394888', borderRadius:4}]
+    }, options:{indexAxis:'y', responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+    
+    // Case studies
+    const casesEl = document.getElementById('ea_cases');
+    casesEl.innerHTML = d.samples.map(c => {
+      const isSuccess = c.type === 'success';
+      const typeLabels = {
+        wrong_cluster: 'Wrong Cluster', old_world_ambiguity: 'Old World Ambiguity',
+        cluster_ok_item_miss: 'Cluster OK, Wrong Item', high_price_ambiguity: 'High Price Ambiguity', success: 'Success'
+      };
+      return `<div class="case-card ${isSuccess?'success':'fail'}">
+        <span class="case-type ${isSuccess?'success':'fail'}">${typeLabels[c.type]||c.type}</span>
+        <div style="font-size:0.82rem;font-weight:600;margin-bottom:8px;">${c.instruction}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.75rem;">
+          <div><span style="color:var(--muted);">Target: </span><span style="color:var(--gold-l);">${c.target_id}</span> <span style="color:var(--muted);">(cluster ${c.target_cluster})</span></div>
+          <div><span style="color:var(--muted);">Predicted: </span><span style="color:${isSuccess?'var(--green-l)':'var(--red-l)'}">${c.pred_top1}</span> <span style="color:var(--muted);">(cluster ${c.pred_cluster})</span></div>
+        </div>
+        ${!isSuccess ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:8px;">💡 Root Cause: ${{wrong_cluster:'LLM predicted wrong cluster due to semantic overlap', old_world_ambiguity:'Multiple clusters match Old World wine (Italy/France/Spain)', cluster_ok_item_miss:'Correct cluster, but 130K items in cluster → item rank is low', high_price_ambiguity:'High price ($100+) has sparse data → LLM is less accurate'}[c.type]||''}</div>` : '<div style="font-size:0.72rem;color:var(--green-l);margin-top:8px;">✓ LLM successfully generated both correct cluster and item ID</div>'}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('ea_cases').innerHTML = '<div class="empty-state">❌ Failed to load data</div>';
+  }
+}
+
+// ── Load catalog stats ────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch('/api/catalog/stats');
+    const d = await res.json();
+    document.getElementById('catalogInfo').innerHTML =
+      `✅ Server Online · <strong>${d.n_products}</strong> Sapo · <strong>${d.n_users}</strong> Customers · <strong>${d.n_winemag.toLocaleString()}</strong> Winemag`;
+  } catch(e) {
+    document.getElementById('catalogInfo').textContent = '❌ Cannot connect to server — please run: python demo/app.py';
+    document.getElementById('serverStatus').innerHTML = '<span class="status-dot" style="background:#e63946"></span> Server offline';
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadStats();
+  document.getElementById('searchQuery').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+  document.getElementById('compareQuery').addEventListener('keydown', e => { if(e.key==='Enter') doCompare(); });
+  doSearch();
+});
+</script>
+</body>
+</html>

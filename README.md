@@ -1,265 +1,235 @@
-# Generative Retrieval for Explainable Wine Recommendation using LLMs
+# Generative Retrieval for Explainable Wine Recommendation using Large Language Models
 
-> **Đề tài:** Generative Retrieval for Explainable Wine Recommendation using Large Language Models  
-> **Dataset:** [Kaggle Wine Reviews 130k](https://www.kaggle.com/datasets/zynicide/wine-reviews) — Aeberhard, S. (2017)
+**Tác giả:** Trần Thành Trung — MSHV: 251805014  
+**GVHD:** TS. Trần Trung Tín  
+**Trường:** Đại học Tôn Đức Thắng — Khoa Công nghệ Thông tin  
+**Năm:** 2026
 
 ---
 
-## Kiến trúc hệ thống
+## 📌 Tóm tắt
+
+Hệ thống gợi ý rượu vang kết hợp **Generative Retrieval** (TIGER framework với Llama-3-8B LoRA) và **Collaborative Filtering** trên hai tập dữ liệu:
+- **Winemag-130K**: 129,915 chai rượu vang quốc tế → đánh giá Cold-Start
+- **Sapo (Việt Nam)**: 305 sản phẩm, 400+ khách hàng → đánh giá Warm-Start
+
+### Kết quả chính
+
+| Phương pháp | Recall@1 | Recall@10 | NDCG@10 | Latency |
+|---|---|---|---|---|
+| BM25 Baseline | 0.80% | 2.60% | 1.34% | 238ms |
+| BM25+ Enhanced | 0.80% | 3.80% | 2.01% | 339ms |
+| **TIGER + Price Rerank (Đề xuất)** | **1.60%** | **5.60%** | **3.40%** | 2,278ms |
+| Sapo CF (Warm-Start) | 56.00% | **81.33%** | 68.52% | <1ms |
+
+---
+
+## 📁 Cấu trúc thư mục
 
 ```
-[A] Data Preparation
-    winemag-data-130k-v2.csv → Semantic ID → group split JSONL
-    └── data_prep.py
-
-[B] LLM Fine-Tuning (Llama-3-8B + LoRA)
-    wine_train_130k.jsonl → lora_wine_model/
-    └── fine_tune.py  |  Wine_Finetune_Colab.ipynb
-
-[C] Baselines
-    BM25 + TF-IDF CF + Base RAG (no LoRA)
-    └── baseline_eval.py  |  base_rag_eval.py
-
-[D] RAG + XAI Pipeline
-    ChromaDB + FastAPI + SHAP Explanation
-    └── inference_rag.py  |  xai_shap.py
-
-[E] Evaluation
-    EM, ROUGE-L, BERTScore → final_comparison.csv
-    └── Wine_Evaluate_Colab.ipynb  |  merge_results.py
+CD3/
+├── data/
+│   ├── raw/                     # Winemag 130K CSV gốc
+│   ├── processed/               # Catalog + test/train/val sets với Semantic ID
+│   │   ├── wine_catalog_semantic.csv   # 130K wines + Semantic_ID + Cluster
+│   │   ├── wine_train_130k.jsonl
+│   │   ├── wine_val_130k.jsonl
+│   │   └── wine_test_130k.jsonl
+│   └── sapo/                    # Dữ liệu Sapo (đã ẩn danh)
+│       ├── sapo_catalog.csv
+│       ├── sapo_interactions.csv
+│       └── sapo_test.jsonl
+├── src/
+│   ├── data/                    # Data preprocessing scripts
+│   ├── models/                  # Model definitions
+│   └── training/                # LoRA fine-tuning scripts
+├── evaluation/                  # Evaluation scripts
+├── demo/
+│   ├── app.py                   # Flask backend (BM25/TF-IDF/CF/LLM demo)
+│   ├── index.html               # Web UI demo
+│   └── error_analysis_data.json # Pre-computed error analysis
+├── results/                     # Saved evaluation results
+│   ├── constrained_eval_beam10_500.csv  # TIGER beam search results
+│   ├── baseline_comparison.csv          # All baseline results
+│   └── sapo_ablation_results.csv        # Sapo ablation study
+├── Sapo/                        # Sapo raw data + ablation scripts
+├── thesis/                      # Thesis document
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## Trạng thái hiện tại (Tuần 17/18)
+## ⚙️ Cài đặt môi trường
 
-| Module | File | Status |
-|---|---|---|
-| A. Data Prep | `data_prep.py` | ✅ Semantic_ID group split — no train/test ID overlap |
-| B. Fine-Tune | `src/fine_tune.py` + `models/lora_wine_model/` | ✅ LoRA r=16 script; rerun after new group split |
-| C1. BM25 | `evaluation/baseline_eval.py` | ✅ Group split Recall@10=0.187, MRR=0.075 |
-| C2. TF-IDF CF | `evaluation/baseline_eval.py` | ✅ Group split Recall@10=0.141, MRR=0.056 |
-| C3. Base RAG | `evaluation/base_rag_eval.py` | ✅ EM=0.00% (mock smoke test; GPU needed for real) |
-| D. RAG+XAI | `src/inference_rag.py` + `src/xai_shap.py` | ✅ SHAP integrated |
-| E. LLM Eval | `notebooks/Wine_Evaluate_Colab.ipynb` | 🔴 **TODO — chạy real eval trên Colab GPU** |
+### Yêu cầu
+- Python 3.10+
+- CUDA 11.8+ (để fine-tune, không bắt buộc để chạy demo)
+- RAM: ≥ 16GB (để load Winemag 130K index)
 
----
-
-## Kết quả so sánh hiện tại (1000 samples)
-
-| Method | Recall@1 | Recall@5 | Recall@10 | NDCG@5 | MRR | ROUGE-L | BERTScore |
-|---|---|---|---|---|---|---|---|
-| BM25 | 0.0400 | 0.1140 | **0.1870** | 0.0774 | 0.0751 | — | — |
-| TF-IDF CF | 0.0290 | 0.0950 | 0.1410 | 0.0606 | 0.0557 | — | — |
-| Base RAG (no LoRA) | 0.0000 | — | — | — | — | 0.1245 | — |
-| **LLM-LoRA (Proposed)** | **Pending real Colab eval** | — | — | — | — | **Pending** | **Pending** |
-
-> **Luận điểm:** Nếu `LLM-LoRA Recall@1 > BM25 Recall@10` (0.187 trên group split) → single-shot GR vượt top-10 keyword retrieval
-
----
-
-## Cài đặt
+### Bước 1: Tạo môi trường ảo
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+source .venv/bin/activate
+```
+
+### Bước 2: Cài dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
+`requirements.txt` chính:
+```
+flask>=3.0
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+rank-bm25>=0.2.2
+transformers>=4.40
+peft>=0.9           # LoRA fine-tuning
+torch>=2.1          # với CUDA
+bitsandbytes>=0.43  # 4-bit quantization
+```
+
 ---
 
-## Chạy hệ thống
+## 🚀 Chạy Demo (Không cần GPU)
+
+Demo sử dụng BM25/TF-IDF thực tế + mô phỏng Inference LLM:
+
+```bash
+# Windows
+.venv\Scripts\python.exe demo\app.py
+
+# Linux/Mac
+.venv/bin/python demo/app.py
+```
+
+Mở trình duyệt: **http://localhost:5005**
+
+### Các tính năng Demo:
+| Tab | Mô tả |
+|-----|-------|
+| 🔍 Tìm kiếm | BM25 / TF-IDF / Winemag 130K / TIGER Llama-3 (simulated) |
+| ⚖️ So sánh | 5 phương pháp song song: M1-M5 |
+| 👤 Gợi ý Cá nhân | CF trên dữ liệu Sapo thực (khách hàng đã ẩn danh) |
+| 💡 Giải thích | Tại sao hệ thống recommend sản phẩm đó |
+| 🔬 Phân tích Lỗi | Error analysis từ N=500 test cases thực tế |
+| 📊 Kết quả | Bảng so sánh và SOTA comparison |
+
+---
+
+## 🔬 Reproduce Kết quả
 
 ### 1. Chuẩn bị dữ liệu
+
 ```bash
-python3 src/data_prep.py
-# Output: data/processed/wine_{train,val,test}_130k.jsonl
+# Đã có sẵn trong data/processed/
+# Nếu cần re-generate từ raw data:
+.venv\Scripts\python.exe src/data/preprocess_winemag.py
 ```
 
-### 2. Fine-tuning (cần GPU — chạy trên Colab)
+### 2. Sinh Semantic ID (K-Means Hierarchical)
+
 ```bash
-# Upload notebooks/Wine_Finetune_Colab.ipynb lên Google Colab
-# Tải về: lora_wine_model.zip → giải nén vào models/lora_wine_model/
+.venv\Scripts\python.exe src/data/generate_semantic_ids.py \
+  --input data/raw/winemag-data-130k-v2.csv \
+  --output data/processed/wine_catalog_semantic.csv \
+  --n_clusters 16 --depth 3
 ```
 
-### 3. Baseline evaluation
+### 3. Fine-tune Llama-3 với LoRA (cần GPU A100/H100 hoặc Colab Pro)
+
 ```bash
-python3 evaluation/baseline_eval.py          # BM25 + TF-IDF CF
-python3 evaluation/base_rag_eval.py --mock   # Base RAG mock smoke test
-# Output: results/baseline_comparison.csv
+# Xem hướng dẫn chi tiết trong colab_instructions.md
+# hoặc chạy:
+.venv\Scripts\python.exe src/training/train_lora.py \
+  --model meta-llama/Meta-Llama-3-8B \
+  --train_data data/processed/wine_train_130k.jsonl \
+  --output_dir results/training_outputs \
+  --lora_r 16 --lora_alpha 32 \
+  --num_epochs 3 --batch_size 4
 ```
 
-### 4. Demo API
+### 4. Đánh giá Baseline
+
 ```bash
-cd src && uvicorn inference_rag:app --reload --port 8080
-# UI:     http://localhost:8080
-# Health: http://localhost:8080/health
-# SHAP:   POST http://localhost:8080/explain
+.venv\Scripts\python.exe evaluation/eval_baselines.py \
+  --test data/processed/wine_test_130k.jsonl \
+  --catalog data/processed/wine_catalog_semantic.csv \
+  --n 500
 ```
 
-### 5. Đánh giá LLM (Colab GPU)
-```
-Upload lên Colab:
-  - notebooks/Wine_Evaluate_Colab.ipynb
-  - data/processed/wine_test_130k.jsonl
-  - results/baseline_comparison.csv
-  - models/lora_wine_model.zip
+### 5. Đánh giá TIGER (Constrained Beam Search)
 
-Tải về → đặt vào results/:
-  - llm_eval_results.csv
-```
-
-### 6. Tổng hợp kết quả cuối
 ```bash
-python3 evaluation/merge_results.py --llm results/llm_eval_results.csv
-# → In bảng so sánh 4 methods + LaTeX table
-# → Lưu: results/final_comparison.csv
+# Cần model đã fine-tune
+.venv\Scripts\python.exe evaluation/eval_tiger.py \
+  --model_path results/training_outputs/checkpoint-best \
+  --test data/processed/wine_test_130k.jsonl \
+  --output results/constrained_eval_beam10_500.csv \
+  --beam_size 10 --n 500
 ```
 
-> Không dùng `--add_mock_llm` cho bảng chính. Tuỳ chọn này chỉ tạo dòng
-> `LLM-LoRA (Estimated - not main)` để minh hoạ khi chưa có kết quả Colab thật.
+### 6. Ablation Study Sapo
 
-### 7. Test heuristic SHAP attribution standalone
 ```bash
-python3 src/xai_shap.py
-# → Benchmark 3 queries, in heuristic SHAP values + latency
-```
-
-### 8. Chạy test
-```bash
-pytest
+.venv\Scripts\python.exe Sapo/sapo_ablation.py
+# Output: results/sapo_ablation_results.csv
 ```
 
 ---
 
-## API Endpoints
+## 📊 Kiến trúc hệ thống
 
-| Method | Endpoint | Mô tả |
-|---|---|---|
-| GET | `/` | UI demo (chat interface) |
-| POST | `/recommend` | Wine recommendation + SHAP XAI |
-| POST | `/explain` | Standalone SHAP explanation |
-| GET | `/health` | System status (LLM, ChromaDB, SHAP) |
-
-### Ví dụ response `/recommend`
-```json
-{
-  "type": "recommendation",
-  "message": "I recommend this bold Cabernet...",
-  "retrieved_wine": {
-    "title": "Jordan 2016 Cabernet Sauvignon",
-    "country": "US", "variety": "Cabernet Sauvignon", "price": 47.0
-  },
-  "xai_explanation": {
-    "attribution_type": "heuristic_feature_attribution",
-    "score_model": "weighted_features_v1",
-    "feature_names": ["price_match", "style_match", "pairing_match", "region_match", "semantic_sim"],
-    "shap_values": [0.045, 0.082, 0.031, 0.150, 0.0],
-    "base_value": 0.325,
-    "explanation_text": "↑ region_match: +0.150\n↑ style_match: +0.082\n↑ price_match: +0.045"
-  }
-}
+```
+Query (Natural Language)
+         │
+         ▼
+   ┌─────────────┐
+   │  Llama-3-8B │  ← Fine-tuned với LoRA (rank=16)
+   │    LoRA     │     Constrained Decoding
+   └──────┬──────┘
+          │ Semantic ID: [C1-C2-C3-item]
+          ▼
+   ┌─────────────┐
+   │   Cluster   │  K-Means (16^3 = 4096 clusters)
+   │   Filter    │  → Lọc từ 130K xuống ~50 ứng viên
+   └──────┬──────┘
+          │
+          ▼
+   ┌─────────────┐
+   │    Price    │  Re-rank theo giá gần nhất với query
+   │   Reranker  │
+   └──────┬──────┘
+          │
+          ▼
+      Top-10 Results + Explanations
 ```
 
 ---
 
-## XAI — Heuristic SHAP Feature Attribution
+## 📖 Tài liệu tham khảo chính
 
-SHAP (SHapley Additive exPlanations) được dùng để giải thích đóng góp của 5 feature
-trong một hàm điểm heuristic minh bạch. Đây là **heuristic feature attribution**,
-không phải giải thích trực tiếp trạng thái nội bộ của LLM hoặc ChromaDB.
-
-**5 features được phân tích:**
-
-| Feature | Ý nghĩa | Công thức |
-|---|---|---|
-| `price_match` | Budget compatibility | min(q_price, w_price) / max(...) |
-| `style_match` | Style keyword overlap | Jaccard(query words, variety words) |
-| `pairing_match` | Food pairing score | # food keywords matched / total |
-| `region_match` | Country mentioned | 1.0 if country in query else 0 |
-| `semantic_sim` | Embedding similarity | cosine(query_emb, wine_emb) |
-
-```bash
-# Test heuristic SHAP standalone
-python3 src/xai_shap.py
-```
+1. **TIGER** — Rajput et al., 2023. "Recommender Systems with Generative Retrieval." *NeurIPS 2023*.
+2. **DSI** — Tay et al., 2022. "Transformer Memory as a Differentiable Search Index." *NeurIPS 2022*.
+3. **P5** — Geng et al., 2022. "Recommendation as Language Processing." *RecSys 2022*.
+4. **Llama-3** — Meta AI, 2024. "Introducing Meta Llama 3." Meta Blog.
+5. **BIGRec** — Hou et al., 2023. "Bridging Language and Items for Retrieval and Recommendation." *arXiv*.
 
 ---
 
-## Semantic ID Design
+## 📝 License & Dữ liệu
 
-```
-FORMAT: COUNTRY(4) - PROVINCE(4) - VARIETY(4) - YEAR(4)
-
-US-NAPA-CABE-2015  → Napa Valley Cabernet Sauvignon 2015
-FRAN-BORD-REDB-2018 → Bordeaux Red Blend 2018
-ITAL-TUSC-SANG-2016 → Tuscany Sangiovese 2016
-ARGE-MEND-MALB-2015 → Mendoza Malbec 2015
-```
-
-**Thống kê:**
-- Total wines: 129,907
-- Unique Semantic IDs: ~13,245
-- Avg wines per ID: ~9.8 (multiple vintages/producers per style cluster)
+- **Winemag dataset**: Nguồn Kaggle (CC BY-NC-SA 4.0)
+- **Sapo dataset**: Dữ liệu thực tế được ẩn danh hóa, chỉ dùng cho mục đích nghiên cứu học thuật
+- **Code**: MIT License
 
 ---
 
-## BibTeX
-
-```bibtex
-@misc{wine_kaggle_2017,
-  author    = {Aeberhard, Stefan and Forina, M.},
-  title     = {{Wine Reviews}},
-  year      = {2017},
-  publisher = {Kaggle},
-  url       = {https://www.kaggle.com/datasets/zynicide/wine-reviews}
-}
-```
-
----
-
-## Cấu trúc thư mục
-
-```
-Code LLM Recommend System/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── config.py                        ← centralized path constants
-├── reorganize.py                    ← script đã dùng để sắp xếp
-│
-├── src/                             ← source code chính
-│   ├── data_prep.py                   Tạo Semantic ID, split train/val/test
-│   ├── fine_tune.py                   LoRA fine-tuning Llama-3-8B
-│   ├── inference_rag.py               FastAPI server + SHAP integration
-│   └── xai_shap.py                    SHAP XAI module (5 features)
-│
-├── evaluation/                      ← scripts đánh giá
-│   ├── baseline_eval.py               BM25 + TF-IDF CF evaluation
-│   ├── base_rag_eval.py               Ablation: Base RAG không LoRA
-│   └── merge_results.py               Gộp results → LaTeX table
-│
-├── notebooks/                       ← Colab notebooks
-│   ├── Wine_Finetune_Colab.ipynb      Fine-tuning trên GPU
-│   ├── Wine_Evaluate_Colab.ipynb      Evaluation (1000 samples)
-│   ├── generate_eval_notebook.py      Generator script cho eval notebook
-│   └── generate_notebook.py           Generator script cho fine-tune notebook
-│
-├── data/
-│   ├── raw/winemag-data-130k-v2.csv   Kaggle Wine Reviews (129,907 records)
-│   └── processed/
-│       ├── wine_train_130k.jsonl       103,925 training samples (80%)
-│       ├── wine_val_130k.jsonl          12,991 validation samples (10%)
-│       └── wine_test_130k.jsonl         12,991 test samples (10%)
-│
-├── results/                         ← evaluation outputs
-│   ├── baseline_comparison.csv        BM25 + TF-IDF CF + Base RAG metrics
-│   ├── final_comparison.csv           Bảng so sánh tổng hợp
-│   ├── bm25_per_query.csv             BM25 per-query results
-│   └── tfidf_per_query.csv            TF-IDF per-query results
-│
-├── models/                          ← model artifacts (.gitignored)
-│   └── lora_wine_model/               LoRA adapters (Llama-3-8B)
-│
-├── api/static/                      ← web interface (chat UI)
-└── chroma_db/                       ← ChromaDB vector store (.gitignored)
-```
+*Đây là đề tài luận văn thạc sĩ tại Đại học Tôn Đức Thắng, Khoa Công nghệ Thông tin, 2026.*

@@ -1,0 +1,10 @@
+Method,Recall@1,Recall@5,Recall@10,NDCG@10,MRR,Latency,ClusterMatch@1
+TF-IDF CF,0.31,1.28,2.59,1.23,0.82,1.14,0.0
+BM25,1.07,3.53,5.54,2.95,2.17,1.51,0.0
+BM25+ Enhanced,7.31,13.69,14.45,11.06,9.94,1.57,0.0
+Struct-Filter BM25,7.39,14.02,14.84,11.31,10.15,1.42,0.0
+GNN-Filter,0.21,0.9,1.71,0.8,0.53,1.08,0.0
+"Proposed (TIGER Greedy)
+(Mô hình đề xuất Greedy)",0.15,0.15,0.15,0.15,0.15,2277.5,9.67
+"Proposed (TIGER + Rerank)
+(Mô hình lai đề xuất)",2.42,6.13,7.76,4.87,3.97,2277.5,9.67
