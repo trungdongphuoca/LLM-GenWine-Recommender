@@ -41,3 +41,8 @@ results/training_outputs/
 *.bin
 *.pt
 *.pth
+
+# Scratch and deprecated code
+old/
+scratch/
+Sapo/*.xlsx

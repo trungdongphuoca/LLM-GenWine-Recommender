@@ -1,0 +1,45 @@
+KẾT QUẢ SƠ ĐỒ CẤU TRÚC (Dành cho Word)
+
+SƠ ĐỒ ASCII (Bôi đen toàn bộ sơ đồ, copy dán vào Word, rồi chọn Font "Consolas" hoặc "Courier New", cỡ chữ 9):
+
+               [ Truy vấn đầu vào: Q (Ngôn ngữ tự nhiên) ]
+                                 │
+                                 ▼
+         ┌────────────────────────────────────────────────┐
+         │              LLM Generative Retrieval          │
+         │                  (Llama-3-8B + LoRA)           │
+         │ ---------------------------------------------- │
+         │ Nhiệm vụ: Tối đa hóa xác suất argmax P(Y|Q)    │
+         └───────────────────────┬────────────────────────┘
+                                 │
+                                 │ Mã định danh ngữ nghĩa: 
+                                 │ Y = (c_1, c_2, c_3)
+                                 ▼
+         ┌────────────────────────────────────────────────┐
+         │             Bộ lọc Không gian Dữ liệu          │
+         │                 (Cluster Filter)               │
+         │ ---------------------------------------------- │
+         │ Cơ sở dữ liệu: D (kích thước |D| = 130,000)    │
+         │ Tập ứng viên: D_Y = { d thuộc D | cluster(d)=Y}│
+         └───────────────────────┬────────────────────────┘
+                                 │
+                                 │ Tập con ứng viên D_Y (~50 chai)
+                                 ▼
+         ┌────────────────────────────────────────────────┐
+         │              Bộ Xếp hạng (Price Reranker)      │
+         │ ---------------------------------------------- │
+         │ Thuật toán: argmin |price(d) - p| - λ.points(d)│
+         └───────────────────────┬────────────────────────┘
+                                 │
+                                 │ Tập kết quả Top-K: R_K (Với |R_K| = 10)
+                                 ▼
+               [ Đầu ra: Khuyến nghị & Giải thích (XAI) ]
+
+
+GIẢI THÍCH MÔ HÌNH TOÁN HỌC:
+- Q: Truy vấn ngôn ngữ tự nhiên từ người dùng.
+- Generative Retrieval: Mô hình LLM giải bài toán sinh văn bản bằng cách tối đa hóa xác suất chuỗi argmax P(Y | Q), với Y là chuỗi mã định danh cụm bao gồm các đặc trưng Y = (c_1, c_2, c_3) (tương ứng Quốc gia, Vùng, Giống nho).
+- D: Toàn bộ không gian cơ sở dữ liệu (Catalog) với kích thước |D| = 130.000 sản phẩm.
+- Cluster Filter: Bước lọc cứng không gian dữ liệu bằng tập hợp toán học, trả về tập con ứng viên D_Y = { d thuộc D | cluster(d) = Y }. Bước này giảm độ phức tạp tìm kiếm từ O(|D|) xuống O(|D_Y|).
+- Price Reranker: Thuật toán xếp hạng tối ưu hóa chi phí với mục tiêu cực tiểu hóa (argmin) khoảng cách từ giá thực tế price(d) đến mốc giá mong muốn p, có tính đến trọng số phạt λ đối với điểm đánh giá chuyên gia points(d).
+- Cuối cùng, hệ thống lọc ra tập kết quả R_K chứa K=10 sản phẩm tối ưu nhất để tích hợp giải thích (XAI) và trả về người dùng.
