@@ -48,7 +48,7 @@ cat['search_text'] = (
     cat['description'].apply(safe_str).str[:300]
 ).str.lower()
 
-# TF-IDF
+# Tf-Idf
 print("🔧 Building TF-IDF index...")
 tfidf = TfidfVectorizer(max_features=5000, ngram_range=(1,2))
 tfidf_mat = tfidf.fit_transform(cat['search_text'])
@@ -57,7 +57,7 @@ tfidf_mat = tfidf.fit_transform(cat['search_text'])
 svd = TruncatedSVD(n_components=64, random_state=42)
 svd_mat = svd.fit_transform(tfidf_mat)
 
-# BM25
+# Bm25
 print("🔧 Building BM25 index...")
 corpus = [t.split() for t in cat['search_text'].tolist()]
 bm25   = BM25Okapi(corpus)
@@ -67,7 +67,7 @@ print("🔧 Building CF matrix...")
 users  = inter['user'].unique().tolist()
 items  = cat['sku'].tolist()
 
-# MASKING USERS
+# Masking Users
 user_map = {u: f"Khách_Hàng_{i+1:03d}" for i, u in enumerate(users)}
 reverse_user_map = {v: k for k, v in user_map.items()}
 

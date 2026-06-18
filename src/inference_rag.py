@@ -648,8 +648,7 @@ def recommend_wine(request: QueryRequest):
             except Exception as e:
                 print(f"[WARN] SHAP explanation failed: {e}")
 
-        # Clean thought block
-        final_explanation = rationale
+                final_explanation = rationale
         if "</thought>" in final_explanation:
             final_explanation = final_explanation.split("</thought>")[-1].strip()
             

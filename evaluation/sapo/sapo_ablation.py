@@ -281,7 +281,7 @@ def main():
     all_results.append(r)
     print(f"    R@1={r['Recall@1']:.2f}%  R@10={r['Recall@10']:.2f}%  NDCG@10={r['NDCG@10']:.2f}%")
 
-    # M2: BM25
+    # M2: Bm25
     print("  M2: Content BM25...")
     r = eval_method(
         "M2: Content BM25 (no history)",
@@ -291,7 +291,7 @@ def main():
     all_results.append(r)
     print(f"    R@1={r['Recall@1']:.2f}%  R@10={r['Recall@10']:.2f}%  NDCG@10={r['NDCG@10']:.2f}%")
 
-    # M3: CF
+    # M3: Cf
     print("  M3: Collaborative Filtering...")
     r = eval_method(
         "M3: Collaborative Filtering",

@@ -80,7 +80,7 @@ def calc_metrics(results_list, targets_list):
             if p == tgt:
                 ndcg = 1.0 / np.log2(k + 2); break
         ndcg10 += ndcg
-        # MRR
+        # Mrr
         for k, p in enumerate(preds[:10]):
             if p == tgt:
                 mrr += 1.0 / (k + 1); break

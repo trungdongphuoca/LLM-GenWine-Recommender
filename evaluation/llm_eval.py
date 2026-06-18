@@ -148,7 +148,7 @@ def eval_components(pred_id: str, target_id: str):
     intent   = int(country and variety)
     return country, variety, vintage, intent
 
-# ROUGE-L
+# Rouge-L
 try:
     from rouge_score import rouge_scorer as _rs
     rouge_sc = _rs.RougeScorer(["rougeL"], use_stemmer=True)
