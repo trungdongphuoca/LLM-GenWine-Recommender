@@ -53,7 +53,7 @@ CD3/
 │   ├── baseline_comparison.csv          # All baseline results
 │   └── sapo_ablation_results.csv        # Sapo ablation study
 ├── Sapo/                        # Sapo raw data + ablation scripts
-├── thesis/                      # Thesis document
+├── thesis/                      # project document
 ├── requirements.txt
 └── README.md
 ```
@@ -232,4 +232,4 @@ Query (Natural Language)
 
 ---
 
-*Đây là đề tài luận văn thạc sĩ tại Đại học Tôn Đức Thắng, Khoa Công nghệ Thông tin, 2026.*
+*Đây là đề tài Chuyên đề 3 tại Đại học Tôn Đức Thắng, Khoa Công nghệ Thông tin, 2026.*

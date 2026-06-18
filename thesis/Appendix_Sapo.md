@@ -5,7 +5,7 @@
 
 ## A.1. Giới thiệu
 
-Để kiểm chứng tính tổng quát hóa của phương pháp và làm rõ vai trò của **dữ liệu lịch sử người dùng**, luận văn thực hiện thêm một ablation study độc lập trên bộ dữ liệu **Sapo** — dữ liệu kinh doanh rượu vang thực tế của một cửa hàng tại Việt Nam.
+Để kiểm chứng tính tổng quát hóa của phương pháp và làm rõ vai trò của **dữ liệu lịch sử người dùng**, chuyên đề thực hiện thêm một ablation study độc lập trên bộ dữ liệu **Sapo** — dữ liệu kinh doanh rượu vang thực tế của một cửa hàng tại Việt Nam.
 
 Đây là điểm khác biệt cốt lõi so với bộ dữ liệu Winemag:
 

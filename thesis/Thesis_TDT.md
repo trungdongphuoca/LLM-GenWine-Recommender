@@ -12,7 +12,7 @@ KHOA CÔNG NGHỆ THÔNG TIN
 
 <br><br><br><br>
 
-**LUẬN VĂN THẠC SĨ**  
+**Chuyên đề 3**  
 **Chuyên ngành: Khoa học Máy tính**  
 
 <br><br><br><br><br><br>
@@ -36,7 +36,7 @@ KHOA CÔNG NGHỆ THÔNG TIN
 
 <br><br><br><br>
 
-**LUẬN VĂN THẠC SĨ**  
+**Chuyên đề 3**  
 **Chuyên ngành: Khoa học Máy tính**  
 
 <br><br><br>
@@ -51,11 +51,11 @@ KHOA CÔNG NGHỆ THÔNG TIN
 
 # LỜI CẢM ƠN
 
-Lời đầu tiên, tôi xin bày tỏ lòng biết ơn sâu sắc nhất tới TS. Trần Trung Tín, người hướng dẫn khoa học trực tiếp của tôi. Trong suốt quá trình học tập và thực hiện đề tài luận văn thạc sĩ này, Thầy đã luôn dành nhiều thời gian, tâm huyết để tận tình hướng dẫn, định hướng khoa học, đóng góp những ý kiến vô cùng quý báu và động viên tinh thần giúp tôi vượt qua những giai đoạn khó khăn để hoàn thành nghiên cứu một cách trọn vẹn nhất.
+Lời đầu tiên, tôi xin bày tỏ lòng biết ơn sâu sắc nhất tới TS. Trần Trung Tín, người hướng dẫn khoa học trực tiếp của tôi. Trong suốt quá trình học tập và thực hiện đề tài Chuyên đề 3 này, Thầy đã luôn dành nhiều thời gian, tâm huyết để tận tình hướng dẫn, định hướng khoa học, đóng góp những ý kiến vô cùng quý báu và động viên tinh thần giúp tôi vượt qua những giai đoạn khó khăn để hoàn thành nghiên cứu một cách trọn vẹn nhất.
 
 Tôi cũng xin trân trọng cảm ơn Ban Giám hiệu, Phòng Đào tạo Sau đại học cùng toàn thể Quý Thầy/Cô Khoa Công nghệ Thông tin, Trường Đại học Tôn Đức Thắng đã giảng dạy, truyền đạt những tri thức khoa học quý báu và tạo mọi điều kiện thuận lợi nhất về cơ sở vật chất, trang thiết bị phòng thí nghiệm trong suốt những năm tháng tôi học tập và nghiên cứu tại trường.
 
-Cuối cùng, tôi xin gửi lời tri ân sâu sắc tới gia đình, bạn bè và các đồng nghiệp tại phòng nghiên cứu lab khoa CNTT đã luôn bên cạnh chia sẻ, động viên, tạo động lực to lớn và hỗ trợ mọi mặt để tôi có thể tập trung hoàn thành tốt luận văn này. Sự thành công của công trình này là kết quả của sự đồng hành và giúp đỡ to lớn của mọi người.
+Cuối cùng, tôi xin gửi lời tri ân sâu sắc tới gia đình, bạn bè và các đồng nghiệp tại phòng nghiên cứu lab khoa CNTT đã luôn bên cạnh chia sẻ, động viên, tạo động lực to lớn và hỗ trợ mọi mặt để tôi có thể tập trung hoàn thành tốt chuyên đề này. Sự thành công của công trình này là kết quả của sự đồng hành và giúp đỡ to lớn của mọi người.
 
 TP. Hồ Chí Minh, ngày 17 tháng 6 năm 2026  
 Học viên  
@@ -66,14 +66,14 @@ Học viên
 
 # LỜI CAM ĐOAN
 
-Tôi xin cam đoan luận văn thạc sĩ khoa học *"Truy xuất tạo sinh trong Hệ gợi ý rượu vang có khả năng giải thích sử dụng mô hình ngôn ngữ lớn"* này hoàn toàn là công trình nghiên cứu và kết quả làm việc thực chất của riêng tôi dưới sự hướng dẫn khoa học trực tiếp của TS. Trần Trung Tín.
+Tôi xin cam đoan Chuyên đề 3 khoa học *"Truy xuất tạo sinh trong Hệ gợi ý rượu vang có khả năng giải thích sử dụng mô hình ngôn ngữ lớn"* này hoàn toàn là công trình nghiên cứu và kết quả làm việc thực chất của riêng tôi dưới sự hướng dẫn khoa học trực tiếp của TS. Trần Trung Tín.
 
-Các nội dung lý thuyết, phương pháp đề xuất, số liệu thực nghiệm và các kết quả phân tích đánh giá được trình bày trong luận văn này là hoàn toàn trung thực, khách quan và chưa từng được công bố hoặc sử dụng dưới bất kỳ hình thức nào trước đây để nhận các học vị hay chứng chỉ học thuật khác.
+Các nội dung lý thuyết, phương pháp đề xuất, số liệu thực nghiệm và các kết quả phân tích đánh giá được trình bày trong chuyên đề này là hoàn toàn trung thực, khách quan và chưa từng được công bố hoặc sử dụng dưới bất kỳ hình thức nào trước đây để nhận các học vị hay chứng chỉ học thuật khác.
 
-Mọi tài liệu tham khảo, hình vẽ, bảng biểu, công thức toán học và các trích dẫn sử dụng trong luận văn đều được tôi kiểm chứng và ghi rõ nguồn gốc xuất xứ cụ thể, minh bạch, tuân thủ đúng các quy định về sở hữu trí tuệ và đạo đức khoa học. Tôi xin hoàn toàn chịu trách nhiệm trước Hội đồng đánh giá luận văn và Nhà trường về tính chân thực của các nội dung cam đoan ở trên.
+Mọi tài liệu tham khảo, hình vẽ, bảng biểu, công thức toán học và các trích dẫn sử dụng trong chuyên đề đều được tôi kiểm chứng và ghi rõ nguồn gốc xuất xứ cụ thể, minh bạch, tuân thủ đúng các quy định về sở hữu trí tuệ và đạo đức khoa học. Tôi xin hoàn toàn chịu trách nhiệm trước Hội đồng đánh giá chuyên đề và Nhà trường về tính chân thực của các nội dung cam đoan ở trên.
 
 TP. Hồ Chí Minh, ngày 17 tháng 6 năm 2026  
-Tác giả luận văn  
+Tác giả chuyên đề  
 
 *Trần Thành Trung*
 
@@ -95,7 +95,7 @@ Kết quả đánh giá trên toàn bộ tập test gồm 12.991 mẫu cho thấ
 
 # ABSTRACT
 
-Conventional wine recommendation systems typically rely on Collaborative Filtering or Content-Based Filtering, which suffer from the cold-start problem and lack semantic explainability. This thesis proposes and implements two novel hybrid recommender architectures utilizing Large Language Models (LLMs) to overcome these limitations.
+Conventional wine recommendation systems typically rely on Collaborative Filtering or Content-Based Filtering, which suffer from the cold-start problem and lack semantic explainability. This project proposes and implements two novel hybrid recommender architectures utilizing Large Language Models (LLMs) to overcome these limitations.
 
 Model 1 (TIGER + Price Rerank) integrates Generative Retrieval with LLMs. We encode a catalog of 130,000 wine bottles into a 3-level semantic hierarchy (16x16x16 = 4,096 flavor clusters) via hierarchical K-Means clustering on a TF-IDF/SVD vector space. A Meta Llama-3-8B model is fine-tuned with 4-bit quantized LoRA to learn direct mapping from natural language queries to semantic cluster IDs, followed by a price-proximity reranker.
 
@@ -220,7 +220,7 @@ Thị trường rượu vang toàn cầu ngày càng phát triển mạnh mẽ v
 
 Tuy nhiên, các hệ thống gợi ý rượu vang truyền thống gặp nhiều khó khăn. Lọc cộng tác (Collaborative Filtering - CF) đòi hỏi lượng dữ liệu lịch sử tương tác cực lớn giữa người dùng và sản phẩm. Điều này dẫn đến sự bất lực hoàn toàn trước sản phẩm mới hoặc người dùng mới (bài toán khởi động lạnh - Cold-Start). Lọc dựa trên nội dung (Content-Based Filtering - CBF) giải quyết được phần nào bài toán cold-start cho sản phẩm nhưng lại phụ thuộc nặng nề vào các thuộc tính thô được gán nhãn thủ công và không thể tự động khai phá các liên kết ngữ nghĩa ẩn giấu trong các mô tả dài phức tạp.
 
-Sự ra đời của Mô hình Ngôn ngữ Lớn (LLM) và kỹ thuật Truy xuất Tạo sinh (Generative Retrieval) đã mở ra một hướng tiếp cận đột phá. Thay vì tìm kiếm sản phẩm trong không gian vector cứng nhắc hoặc sử dụng chỉ mục đảo ngược truyền thống, mô hình ngôn ngữ lớn có thể học cách "nhớ" toàn bộ danh mục sản phẩm trực tiếp vào trọng số của nó thông qua quá trình fine-tuning Seq2Seq và sinh trực tiếp mã định danh (ID) của sản phẩm tương thích từ truy vấn ngôn ngữ tự nhiên tự do của người dùng. Luận văn này tập trung nghiên cứu, hiện thực hóa và đánh giá đối chiếu các phương pháp này trên bộ dữ liệu rượu vang lớn.
+Sự ra đời của Mô hình Ngôn ngữ Lớn (LLM) và kỹ thuật Truy xuất Tạo sinh (Generative Retrieval) đã mở ra một hướng tiếp cận đột phá. Thay vì tìm kiếm sản phẩm trong không gian vector cứng nhắc hoặc sử dụng chỉ mục đảo ngược truyền thống, mô hình ngôn ngữ lớn có thể học cách "nhớ" toàn bộ danh mục sản phẩm trực tiếp vào trọng số của nó thông qua quá trình fine-tuning Seq2Seq và sinh trực tiếp mã định danh (ID) của sản phẩm tương thích từ truy vấn ngôn ngữ tự nhiên tự do của người dùng. Chuyên đề này tập trung nghiên cứu, hiện thực hóa và đánh giá đối chiếu các phương pháp này trên bộ dữ liệu rượu vang lớn.
 
 <!-- PAGE_BREAK -->
 
@@ -242,7 +242,7 @@ Thứ năm, xây dựng bộ khung giải thích hậu nghiệm sử dụng mô 
 
 ## 1.3 Đối tượng và phạm vi nghiên cứu
 
-Đối tượng nghiên cứu của luận văn bao gồm:
+Đối tượng nghiên cứu của chuyên đề bao gồm:
 
 - Không gian ngữ nghĩa biểu diễn sản phẩm rượu vang và các kỹ thuật trích chọn đặc trưng văn bản tự do như TF-IDF, phân tách giá trị kỳ dị TruncatedSVD, và thuật toán phân cụm phân cấp Hierarchical K-Means.
 
@@ -264,7 +264,7 @@ Phạm vi nghiên cứu của đề tài giới hạn trong:
 
 ## 1.4 Phương pháp nghiên cứu
 
-Luận văn áp dụng các phương pháp nghiên cứu khoa học sau:
+Chuyên đề áp dụng các phương pháp nghiên cứu khoa học sau:
 
 - Phương pháp lý thuyết: Nghiên cứu các tài liệu học thuật chính thống về hệ gợi ý, mô hình ngôn ngữ lớn, cơ chế tự chú ý (Self-Attention) và lý thuyết thông tin. Phân tích các mô hình baseline nổi tiếng như DSI của Google Research và LoRA của Microsoft.
 
@@ -318,7 +318,7 @@ Mặt khác, các mô hình dựa trên Transformer (như BERT4Rec, SASRec) khai
 
 ## 2.4 Bối cảnh đào tạo và Nghiên cứu tại Trường
 
-Đề tài nghiên cứu này được thực hiện trong khuôn khổ chương trình đào tạo Thạc sĩ ngành Khoa học Máy tính tại Trường Đại học Tôn Đức Thắng. Chương trình đào tạo thạc sĩ của trường hướng tới việc trang bị cho học viên các kiến thức khoa học tiên tiến và kỹ năng thực hành nghiên cứu chuyên sâu, đặc biệt trong các lĩnh vực Trí tuệ Nhân tạo, Học máy và Xử lý Ngôn ngữ Tự nhiên. Sự hỗ trợ từ chương trình đào tạo là nền tảng định hướng học thuật vững chắc cho việc phát triển các kiến thức trong luận văn này.
+Đề tài nghiên cứu này được thực hiện trong khuôn khổ chương trình đào tạo Thạc sĩ ngành Khoa học Máy tính tại Trường Đại học Tôn Đức Thắng. Chương trình đào tạo thạc sĩ của trường hướng tới việc trang bị cho học viên các kiến thức khoa học tiên tiến và kỹ năng thực hành nghiên cứu chuyên sâu, đặc biệt trong các lĩnh vực Trí tuệ Nhân tạo, Học máy và Xử lý Ngôn ngữ Tự nhiên. Sự hỗ trợ từ chương trình đào tạo là nền tảng định hướng học thuật vững chắc cho việc phát triển các kiến thức trong chuyên đề này.
 
 ![HÌNH 0.2 Giới thiệu chương trình thạc sĩ](thesis/master_intro.png)  
 *Hình 0.2 — Giới thiệu chương trình thạc sĩ Khoa học Máy tính*  
@@ -333,7 +333,7 @@ Trong khuôn khổ tổng quan nghiên cứu, chúng tôi tiến hành khảo s�
 
 Vivino sử dụng một cơ chế lọc dựa trên điểm số đánh giá trung bình từ hàng triệu người dùng cộng đồng kết hợp với việc gán nhãn hương vị bằng từ khóa tĩnh (ví dụ: "bold", "acidic", "sweet"). Hệ thống này hoạt động rất hiệu quả khi có lượng tương tác khổng lồ nhưng gặp khó khăn nghiêm trọng khi giới thiệu các nhà sản xuất vang thủ công nhỏ (artisanal wineries) chưa có nhiều lượt đánh giá.
 
-Wine.com sử dụng mô hình lọc theo nội dung kết hợp sự tư vấn thủ công của các Sommelier. Tuy nhiên, cách tiếp cận này khó mở rộng quy mô (scalability) và không thể cung cấp lời lý giải cá nhân hóa theo thời gian thực cho từng truy vấn cụ thể của khách hàng. Điều này làm nổi bật khoảng trống nghiên cứu mà đề tài luận văn hướng tới: phát triển một Sommelier ảo tự động hóa hoàn toàn bằng trí tuệ nhân tạo, có thể hoạt động ở quy mô lớn với chi phí vận hành thấp.
+Wine.com sử dụng mô hình lọc theo nội dung kết hợp sự tư vấn thủ công của các Sommelier. Tuy nhiên, cách tiếp cận này khó mở rộng quy mô (scalability) và không thể cung cấp lời lý giải cá nhân hóa theo thời gian thực cho từng truy vấn cụ thể của khách hàng. Điều này làm nổi bật khoảng trống nghiên cứu mà đề tài chuyên đề hướng tới: phát triển một Sommelier ảo tự động hóa hoàn toàn bằng trí tuệ nhân tạo, có thể hoạt động ở quy mô lớn với chi phí vận hành thấp.
 
 <!-- PAGE_BREAK -->
 
@@ -365,7 +365,7 @@ $$W = W_0 + \frac{\alpha}{r} B A$$
 
 ## 3.4 Phân tích Số liệu Dữ liệu Nghiên cứu
 
-Dưới đây là bảng thống kê số liệu mô tả sơ bộ các đặc trưng chính của bộ dữ liệu Wine Reviews (Winemag-130k) và bộ dữ liệu Sapo thực tế được sử dụng trong luận văn. Các dữ liệu này phản ánh cấu trúc quy mô và sự phân bố giá trị, đóng vai trò nền tảng cho việc thiết lập thực nghiệm.
+Dưới đây là bảng thống kê số liệu mô tả sơ bộ các đặc trưng chính của bộ dữ liệu Wine Reviews (Winemag-130k) và bộ dữ liệu Sapo thực tế được sử dụng trong chuyên đề. Các dữ liệu này phản ánh cấu trúc quy mô và sự phân bố giá trị, đóng vai trò nền tảng cho việc thiết lập thực nghiệm.
 
 Bảng 0.1 Số liệu  
 | sTT | a | b | c | d |
@@ -625,7 +625,7 @@ Các phát hiện này là cơ sở quan trọng để chúng tôi đề xuất 
 
 ## 6.1 Kết luận
 
-Luận văn đã hoàn thành đầy đủ các mục tiêu nghiên cứu đề ra và đạt được các kết quả kỹ thuật và khoa học cụ thể sau:
+Chuyên đề đã hoàn thành đầy đủ các mục tiêu nghiên cứu đề ra và đạt được các kết quả kỹ thuật và khoa học cụ thể sau:
 
 Thứ nhất, xây dựng và đánh giá đối chiếu thành công hai mô hình gợi ý rượu vang sử dụng mô hình ngôn ngữ lớn Llama-3-8B. Trong đó, Mô hình 2 (Parser-Filter-Sommelier) đạt Recall@10 xuất sắc là 39,42% và latency lý tưởng 86,6ms trên tập test chuẩn. Mô hình 1 (TIGER + Price Rerank) đạt Recall@10 = 7,76% trên tập chuẩn nhưng đạt hiệu năng vượt trội 43,00% trên tập truy vấn chứa nhiều nhiễu và lỗi chính tả.
 
