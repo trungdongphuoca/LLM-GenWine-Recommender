@@ -46,3 +46,6 @@ results/training_outputs/
 old/
 scratch/
 Sapo/*.xlsx
+
+# Sensitive raw data — anonymized CSVs used instead
+data/sapo/*.xlsx
