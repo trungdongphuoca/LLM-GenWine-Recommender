@@ -49,3 +49,6 @@ Sapo/*.xlsx
 
 # Sensitive raw data — anonymized CSVs used instead
 data/sapo/*.xlsx
+
+# Thesis document (kept local only, not for public repo)
+thesis/
