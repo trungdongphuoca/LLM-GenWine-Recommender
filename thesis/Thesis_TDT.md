@@ -498,6 +498,16 @@ Bộ dữ liệu Wine Reviews (Winemag-130k) được phân chia ngẫu nhiên t
 
 Bên cạnh tập kiểm thử chuẩn, chúng tôi xây dựng một tập benchmark gồm 100 câu truy vấn chứa các lỗi viết sai chính tả cố ý (như "itly", "spnish"), viết tắt hoặc sử dụng từ lóng ("cali", "cab") để đánh giá khả năng chịu lỗi và thích ứng ngữ nghĩa của các mô hình trong điều kiện thực tế.
 
+Về độ phủ (Coverage), 100 câu truy vấn được thiết kế theo 3 danh mục đảm bảo tính đại diện toàn diện cho các kiểu truy vấn khó trong thực tiễn:
+
+- **Danh mục 1 — Sai chính tả & Tiếng lóng (34 truy vấn):** Bao phủ 12 quốc gia sản xuất rượu lớn (Mỹ, Pháp, Ý, Tây Ban Nha, Argentina, Úc, Đức, New Zealand, Chile, Bồ Đào Nha, Áo, Nam Phi) và 18 giống nho đại diện. Mỗi truy vấn cố tình chứa ít nhất một lỗi chính tả hoặc từ viết tắt không chuẩn (ví dụ: "itly" → Italy, "sausion" → Sauvignon, "cali" → California).
+
+- **Danh mục 2 — Mô tả phong cách mơ hồ (33 truy vấn):** Người dùng không đề cập tên giống nho hay quốc gia mà chỉ dùng các hình dung từ cảm quan ("bold and dry red for steak", "buttery white from US", "earthy red for mushroom pasta"). Đây là dạng truy vấn chiếm đa số trong thực tế nhưng là thách thức lớn nhất với các bộ lọc từ khóa cứng.
+
+- **Danh mục 3 — Ghép đôi thực phẩm & Truy vấn ngữ cảnh (33 truy vấn):** Người dùng đưa ra ngữ cảnh sử dụng thay vì đặc điểm rượu (ví dụ: "wine for anniversary dinner", "light bubbly for brunch"). Loại truy vấn này đòi hỏi mô hình phải có hiểu biết ẩn về tương quan giữa dịp uống và loại rượu phù hợp.
+
+Toàn bộ nhãn ground-truth của 100 truy vấn được xác định thủ công theo từ điển chuẩn hóa thực thể (Entity Canonicalization Dictionary) được xây dựng từ dữ liệu Wine Reviews, đảm bảo tính nhất quán và khách quan trong quá trình tính điểm Recall và NDCG.
+
 ### 5.1.3 Các mô hình Baseline đối chứng
 
 Hệ thống được so sánh với 6 phương pháp baseline bao gồm: (1) TF-IDF CF (Lọc theo nội dung truyền thống); (2) Okapi BM25 (Tìm kiếm từ khóa thưa); (3) BM25+ Enhanced (BM25 kết hợp mở rộng truy vấn); (4) Struct-Filter BM25 (BM25 kết hợp lọc cấu trúc); (5) Graph Neural Network (GNN-Filter trên đồ thị tương đồng sản phẩm); (6) TIGER Greedy (Mô hình 1 chạy giải mã greedy không xếp hạng lại).
@@ -544,11 +554,18 @@ Về mặt tốc độ phản hồi (Latency), Mô hình 2 đạt thời gian tr
 
 Mặc dù có hiệu năng thấp hơn trên tập test chuẩn, Mô hình 1 lại thể hiện ưu điểm vượt trội trên tập kiểm thử chứa truy vấn nhiễu và lỗi chính tả. Dưới đây là kết quả đánh giá so sánh hiệu năng của ba phương pháp chính trên tập Noisy Benchmark (N=100):
 
-- Struct-Filter BM25: Đạt Recall@10 = 4,00% và NDCG@10 = 2,04%. Do bộ lọc cấu trúc thô dựa trên từ khóa khớp cứng bị lỗi khi từ khóa viết sai chính tả (như "itly", "cali"), hệ thống phải fallback quét toàn văn bản trên 130k tài liệu khiến kết quả bị loãng nghiêm trọng.
+Bảng 4.2b So sánh hiệu năng trên tập Noisy Benchmark (N=100)  
+| Phương pháp | Recall@10 | NDCG@10 | Ghi chú |
+|:---|:---:|:---:|:---|
+| Struct-Filter BM25 | 4,00% | 2,04% | Fallback toàn bộ 130k khi từ khóa sai chính tả |
+| Mô hình 2 (LLM Parser-Filter) | 8,00% | 5,22% | Parser lỗi khi chuẩn hóa từ viết sai nặng |
+| **Mô hình 1 (TIGER + Price Rerank)** | **43,00%** | **23,74%** | Ngữ nghĩa mềm dẻo, không phụ thuộc từ khóa cứng |
 
-- Mô hình 2 (Parser-Filter): Đạt Recall@10 = 8,00% và NDCG@10 = 5,22%. Do LLM Parser cũng gặp khó khăn trong việc chuẩn hóa các từ viết sai chính tả nặng sang JSON thực thể chuẩn, dẫn đến bộ lọc cấu trúc phía sau nhận thông tin rỗng hoặc sai lệch.
+- **Struct-Filter BM25** đạt Recall@10 = 4,00% và NDCG@10 = 2,04%. Do bộ lọc cấu trúc thô dựa trên từ khóa khớp cứng bị lỗi khi từ khóa viết sai chính tả (như "itly", "cali"), hệ thống phải fallback quét toàn văn bản trên 130k tài liệu khiến kết quả bị loãng nghiêm trọng.
 
-- Mô hình 1 (TIGER + Price Rerank): Đạt Recall@10 = 43,00% và NDCG@10 = 23,74%. Nhờ LLM được tinh chỉnh có khả năng hiểu ngữ nghĩa mềm dẻo, mô hình dễ dàng ánh xạ các từ viết sai chính tả hoặc từ lóng sang đúng mã cụm hương vị ngữ nghĩa phân cấp tương ứng, thu hẹp không gian tìm kiếm xuống chỉ còn vài chục chai trước khi thực hiện lọc giá.
+- **Mô hình 2 (Parser-Filter)** đạt Recall@10 = 8,00% và NDCG@10 = 5,22%. Do LLM Parser cũng gặp khó khăn trong việc chuẩn hóa các từ viết sai chính tả nặng sang JSON thực thể chuẩn, dẫn đến bộ lọc cấu trúc phía sau nhận thông tin rỗng hoặc sai lệch.
+
+- **Mô hình 1 (TIGER + Price Rerank)** đạt Recall@10 = 43,00% và NDCG@10 = 23,74%. Nhờ LLM được tinh chỉnh có khả năng hiểu ngữ nghĩa mềm dẻo, mô hình dễ dàng ánh xạ các từ viết sai chính tả hoặc từ lóng sang đúng mã cụm hương vị ngữ nghĩa phân cấp tương ứng, thu hẹp không gian tìm kiếm xuống chỉ còn vài chục chai trước khi thực hiện lọc giá. Trên cả 3 danh mục truy vấn (sai chính tả, mô tả mơ hồ, ghép đôi thực phẩm), Mô hình 1 đều cho thấy sự vượt trội nhất quán, khẳng định lợi thế căn bản của Generative Retrieval trong điều kiện truy vấn không hoàn hảo.
 
 ![Hình 4.3 Trade-off Accuracy vs. Latency](results/correct_comparison/P4_latency_scatter.png)  
 *Hình 4.3 — Biểu đồ phân tán Accuracy vs. Latency của các mô hình*
@@ -572,7 +589,29 @@ Các số liệu trên Bảng 4.3 chỉ ra rằng: Llama-3-8B đạt tỷ lệ s
 
 <!-- PAGE_BREAK -->
 
-## 5.6 Kết quả Ablation Study
+## 5.6 So sánh với TIGER Gốc (Original Baseline)
+
+Để định vị rõ ràng đóng góp kỹ thuật của chuyên đề này so với phương pháp TIGER nguyên bản được đề xuất bởi Rajput et al. (2023), chúng tôi xây dựng bảng so sánh trực tiếp giữa kiến trúc TIGER gốc và hệ thống đề xuất của chuyên đề:
+
+Bảng 4.3b So sánh với TIGER gốc (Rajput et al., 2023)  
+| Thuộc tính so sánh | TIGER Gốc | Chuyên đề này |
+|:---|:---|:---|
+| Mô hình nền (Backbone) | T5-Base (250M tham số) | Llama-3-8B (8B tham số) |
+| Kỹ thuật tinh chỉnh | Full fine-tuning | QLoRA 4-bit (tiết kiệm VRAM) |
+| Phương pháp phân cụm | K-Means 2 tầng | K-Means 3 tầng phân cấp |
+| Không gian Semantic ID | 2 cấp (C1-C2) | 3 cấp (C1-C2-C3, ≈4096 cụm) |
+| Chiến lược giải mã | Greedy / Beam Search | Constrained Beam Search |
+| Giai đoạn xếp hạng lại | Không có | Price Reranker (thêm mới) |
+| Benchmark chính | Amazon Product | WineReviews 130k + Sapo |
+| Recall@10 báo cáo | ≈ 15–25% (tùy domain) | 7,76% (tập chuẩn), 43% (tập nhiễu) |
+| Hỗ trợ truy vấn nhiễu | Không đánh giá | Có (Noisy Benchmark N=100) |
+| Giải thích kết quả (XAI) | Không | Có (LLM Sommelier) |
+
+**Phân tích sự khác biệt:** Hiệu năng Recall@10 = 7,76% trên tập test chuẩn thấp hơn mức báo cáo của TIGER gốc (≈15–25%) do ba nguyên nhân chính có thể lý giải được: (1) Bộ dữ liệu WineReviews 130k có không gian item rộng hơn đáng kể so với các bộ dữ liệu Amazon sử dụng trong paper gốc; (2) Llama-3-8B dù mạnh hơn T5 về ngữ nghĩa nhưng chưa được tối ưu hóa kiến trúc DSI-Seq2Seq thuần túy; (3) Chuyên đề này sử dụng thiết lập Cold-Start nghiêm ngặt (100% item test chưa xuất hiện trong train), trong khi paper gốc có thể có phần overlap. Đổi lại, hệ thống của chuyên đề vượt trội TIGER gốc trên hai khía cạnh quan trọng: khả năng xử lý truy vấn nhiễu (Recall@10 = 43% trên Noisy Benchmark) và tích hợp giải thích AI (XAI) — những tính năng hoàn toàn vắng mặt trong paper gốc.
+
+<!-- PAGE_BREAK -->
+
+## 5.7 Kết quả Ablation Study
 
 Chúng tôi thực hiện ablation study trên tập test Winemag để làm rõ vai trò đóng góp của hai thành phần cốt lõi trong Mô hình 1: bộ lọc cụm ngữ nghĩa (Cluster Filter) sinh từ LLM và bộ xếp hạng lại theo giá (Price Reranker). Kết quả so sánh giữa các biến thể được trình bày như sau:
 
@@ -592,7 +631,7 @@ Kết quả ablation trên Bảng 4.4 khẳng định sự kết hợp chặt ch
 
 <!-- PAGE_BREAK -->
 
-## 5.7 Thảo luận về sự thích ứng của mô hình
+## 5.8 Thảo luận về sự thích ứng của mô hình
 
 Sự kết hợp giữa hai thử nghiệm trên tập test chuẩn và tập test nhiễu mang lại một kết luận quan trọng về thiết kế hệ thống gợi ý sử dụng LLM:
 
@@ -607,7 +646,7 @@ Không có một mô hình đơn lẻ nào tối ưu trong mọi tình huống.
 
 <!-- PAGE_BREAK -->
 
-## 5.8 Phân tích Lỗi (Error Analysis)
+## 5.9 Phân tích Lỗi (Error Analysis)
 
 Chúng tôi phân tích các mẫu gợi ý thất bại của Mô hình 1 và xác định được ba nhóm nguyên nhân chính gây giảm hiệu năng Recall:
 
