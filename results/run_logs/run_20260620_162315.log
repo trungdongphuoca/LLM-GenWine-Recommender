@@ -1,0 +1,169 @@
+======================================================================
+  EXPERIMENT RUN LOG
+  Project: LLM-GenWine-Recommender (Chuyen de 3)
+  Run ID : 20260620_162315
+======================================================================
+
+[ENVIRONMENT]
+  timestamp: 2026-06-20T16:23:15.365914
+  platform: Windows-10-10.0.26200-SP0
+  python: 3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]
+  hostname: DESKTOP-D9MM22F
+  seed: 42
+  cuda_available: False
+
+============================================================
+[Baseline Evaluation (BM25/TF-IDF)] Starting: D:\TTT\CD3\evaluation/baseline_eval.py
+[Baseline Evaluation (BM25/TF-IDF)] Time: 2026-06-20T16:23:15.390489
+============================================================
+[CONFIG] eval_size=500 | output=D:\TTT\CD3\results\baseline_comparison.csv
+============================================================
+  Wine Recommendation — Baseline Evaluation (11 methods)
+============================================================
+
+============================================================
+Loading catalog: D:\TTT\CD3\data\processed\wine_catalog_semantic.csv
+  Catalog : 129,907 wines | Unique IDs: 129,907
+
+Loading test data...
+  Test queries: 500
+
+────────────────────────────────────────────────────────────
+METHOD 1: BM25 (Okapi, k1=1.2 b=0.65 — tuned for wine vocab)
+  Index: 1.8s
+
+────────────────────────────────────────────────────────────
+METHOD 2: BM25+ Enhanced (variety/country fields repeated ×3)
+  Index: 1.7s
+
+────────────────────────────────────────────────────────────
+METHOD 3: TF-IDF Content-Based CF (max_feat=50k, ngram(1,2))
+  Matrix: (129907, 50000)  |  built: 7.7s
+
+────────────────────────────────────────────────────────────
+METHOD 4: TF-IDF + LSA (SVD 200 dims, Latent Semantic Analysis)
+  LSA shape: (129907, 200)  |  built: 24.8s
+
+────────────────────────────────────────────────────────────
+Building shared indexes for Hybrid method...
+
+────────────────────────────────────────────────────────────
+METHOD 5: Hybrid BM25 + TF-IDF (0.5 × BM25_norm + 0.5 × TF-IDF cosine)
+
+────────────────────────────────────────────────────────────
+METHOD 6: Popularity-Based (country+variety frequency rank)
+
+────────────────────────────────────────────────────────────
+METHOD 7: Random Baseline (lower bound reference)
+
+────────────────────────────────────────────────────────────
+METHOD 8: Structured Filter + TF-IDF (country+variety hard filter)
+  Addresses root cause: region code never in query → filter first
+  Full index: (129907, 80000)  |  built: 8.4s
+  Queries filtered by country+variety: 444/500 (88.8%)
+
+────────────────────────────────────────────────────────────
+METHOD 9: Structured Filter + BM25 (within country+variety group)
+  Full BM25 index: 1.9s
+
+────────────────────────────────────────────────────────────
+METHOD 10: Structured Filter + Price Re-rank (budget proximity)
+  TF-IDF fallback index: 8.1s
+
+────────────────────────────────────────────────────────────
+METHOD 11: GNN-Enhanced Retrieval (LightGCN Embeddings)
+  Loaded GNN embeddings and projection objects in 0.07s
+
+============================================================
+  BASELINE EVALUATION RESULTS
+  Eval size=500 | K=[1, 5, 10]
+============================================================
+Method                           Recall@1       NDCG@1IntentMatch@1     Recall@5       NDCG@5IntentMatch@5    Recall@10      NDCG@10IntentMatch@10          MRR   Latency_ms
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+BM25                               0.0060       0.0060       0.0680       0.0140       0.0095       0.2500       0.0260       0.0134       0.3740       0.0097     216.1469
+BM25+ Enhanced                     0.0080       0.0080       0.1140       0.0240       0.0157       0.3640       0.0380       0.0201       0.4980       0.0148     305.4743
+TF-IDF CF                          0.0000       0.0000       0.0740       0.0080       0.0048       0.2720       0.0180       0.0079       0.4120       0.0048       1.1581
+TF-IDF + LSA                       0.0000       0.0000       0.1080       0.0000       0.0000       0.2780       0.0060       0.0019       0.3800       0.0008       0.3928
+Hybrid BM25+TF-IDF                 0.0060       0.0060       0.0660       0.0120       0.0093       0.2540       0.0220       0.0125       0.3920       0.0096     220.6182
+Popularity-Based                   0.0000       0.0000       0.0060       0.0000       0.0000       0.0160       0.0000       0.0000       0.0400       0.0000      12.9961
+Random Baseline                    0.0000       0.0000       0.0100       0.0000       0.0000       0.0300       0.0000       0.0000       0.0620       0.0000       0.0100
+Struct-Filter TF-IDF               0.0040       0.0040       0.0880       0.0080       0.0063       0.2740       0.0180       0.0094       0.4420       0.0069     137.1832
+Struct-Filter BM25                 0.0060       0.0060       0.0680       0.0140       0.0095       0.2500       0.0260       0.0134       0.3740       0.0097     217.5637
+Struct-Filter+Price                0.0040       0.0040       0.0880       0.0080       0.0063       0.2740       0.0180       0.0094       0.4420       0.0069     136.4428
+GNN-Filter                         0.0020       0.0020       0.0840       0.0080       0.0045       0.2740       0.0120       0.0058       0.4120       0.0039      79.7803
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  ✅ Saved: D:\TTT\CD3\results\baseline_comparison.csv
+  Next: run base_rag_eval.py --update_baseline then merge_results.py
+
+[STDERR]: 
+  BM25:   0%|          | 0/500 [00:00<?, ?it/s]
+  BM25:   0%|          | 1/500 [00:00<01:40,  4.96it/s]
+  BM25:   0%|          | 2/500 [00:00<01:38,  5.04it/s]
+  BM25:   1%|          | 3/500 [00:00<01:39,  4.97it/s]
+  BM25:   1%|          | 4/500 [00:00<01:38,  5.02it/s]
+  BM25:   1%|          | 5/500 [00:01<01:43,  4.80it/s]
+  BM25:   1%|          | 6/500 [00:01<01:40,  4.90it/s]
+  BM25:   1%|▏         | 7/500 [00:01<01:46,  4.62it/s]
+  BM25:   2%|▏         | 8/500 [00:01<01:47,  4.59it/s]
+  BM25:   2%|▏         | 9/500 [00:01<01:51,  4.39it/s]
+  BM25:   2%|▏         | 10/500 [00:02<01:48,  4.50it/s]
+  BM25:   2%|▏         | 11/500 [00:02<01:47,  4.54it/s]
+  BM25:   2%|▏         | 12/500 [00:02<01:47,  4.53it/s]
+  BM25:   3%|▎         | 13/500 [00:02<01:50,  4.41it/s]
+  BM25:   3%|▎         | 14/500 [00:03<01:49,  4.43it/s]
+  BM25:   3%|▎         | 15/500 [00:03<01:49,  4.43it/s]
+  BM25:   3%|▎         | 16/500 [00:03<01:45,  4.61it/s]
+  BM25:   3%|▎         | 17/500 [00:03<01:46,  4.55it/s]
+  BM25:   4%|▎         | 18/500 [00:03<01:44,  4.62it/s]
+  BM25:   4%|▍         | 19/500 [00:04<01:47,  4.46it/s]
+  BM25:   4%|▍         | 20/500 [00:04<01:47,  4.46it/s]
+  BM25:   4%|▍         | 21/500 [00:04<01:43,  4.64it/s]
+  BM25:   4%|▍         | 22/500 [00:04<01:40,  4.73it/s]
+  BM25:   5%|▍         | 23/500 [00:04<01:40,  4.73it/s]
+  BM25:   5%|▍         | 24/500 [00:05<01:39,  4.76it/s]
+  BM25:   5%|▌         | 25/500 [00:05<01:37,  4.87it/s]
+  BM25:   5%|▌         | 26/500 [00:05<01:36,  4.89it/s]
+  BM25:   5%|▌         | 27/500 [00:05<01:36,  4.90it/s]
+  BM25:   6%|▌         | 28/500 [00:05<01:35,  4.96it/s]
+  BM25:   6%|▌         | 29/500 [00:06<01:34,  4.97it/s]
+  BM25:   6%|▌         | 30/500 [00:06<01:39,  4.74it/s]
+  BM25:   6%|▌         | 31/500 [00:06<01:43,  4.54it/s]
+  BM25:   6%|▋         | 32/500 [00:06<01:44,  4.50it/s]
+  BM25:   7%|▋         | 33/500 [00:07<01:42,  4.55it/s]
+  BM25:   7%|▋         | 34/500 [00:07<01:41,  4.58it/s]
+  BM25:   7%|▋        
+[Baseline Evaluation (BM25/TF-IDF)] Completed in 740.5s — exit code: 0
+
+============================================================
+[Noisy Query Benchmark] Starting: D:\TTT\CD3\evaluation/noisy_query_benchmark.py
+[Noisy Query Benchmark] Time: 2026-06-20T16:35:35.874003
+============================================================
+Loading catalog...
+Pre-building BM25 fallback index...
+
+Running benchmark on 100 vague/noisy queries...
+
+=====================================================================================
+                  VAGUE & NOISY QUERY BENCHMARK REPORT (THREE-WAY)
+=====================================================================================
+Metric             | Struct-Filter BM25   | Model 1 (TIGER + Price)   | Model 2 (Parser-Filter)  
+-------------------------------------------------------------------------------------
+Recall@1           |               1.00% |                    6.00% |                    3.00%
+Recall@5           |               2.00% |                   21.00% |                    6.00%
+Recall@10          |               4.00% |                   34.00% |                    7.00%
+NDCG@10            |               2.04% |                   18.05% |                    4.72%
+=====================================================================================
+
+Saved benchmark results to: D:\TTT\CD3\results\noisy_query_benchmark_results.csv
+
+[Noisy Query Benchmark] Completed in 24.1s — exit code: 0
+
+======================================================================
+  SUMMARY
+======================================================================
+  [OK] Baseline Evaluation (BM25/TF-IDF)               740.5s
+  [OK] Noisy Query Benchmark                            24.1s
+
+[LOG] Saved to: D:\TTT\CD3\results\run_logs\run_20260620_162315.log
+[META] Saved to: D:\TTT\CD3\results\run_logs\run_20260620_162315_meta.json

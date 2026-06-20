@@ -1,0 +1,23 @@
+{
+  "env": {
+    "timestamp": "2026-06-20T16:23:15.365914",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "hostname": "DESKTOP-D9MM22F",
+    "seed": 42,
+    "cuda_available": false
+  },
+  "scripts": [
+    {
+      "label": "Baseline Evaluation (BM25/TF-IDF)",
+      "elapsed_sec": 740.48,
+      "returncode": 0
+    },
+    {
+      "label": "Noisy Query Benchmark",
+      "elapsed_sec": 24.12,
+      "returncode": 0
+    }
+  ],
+  "log_file": "D:\\TTT\\CD3\\results\\run_logs\\run_20260620_162315.log"
+}
