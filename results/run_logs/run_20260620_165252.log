@@ -1,0 +1,261 @@
+=================================================================
+  EXPERIMENT RUN LOG
+  Project : LLM-GenWine-Recommender — Chuyen de 3
+  Run ID  : 20260620_165252
+  Log     : D:\TTT\CD3\results\run_logs\run_20260620_165252.log
+=================================================================
+
+[ENVIRONMENT]
+  run_id              : 20260620_165252
+  timestamp           : 2026-06-20T16:52:52.131474
+  platform            : Windows-10-10.0.26200-SP0
+  python              : 3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]
+  hostname            : DESKTOP-D9MM22F
+  seed                : 42
+  torch               : 2.11.0+cu128
+  cuda_available      : True
+  gpu                 : NVIDIA GeForce RTX 5070 Ti
+  vram_gb             : 17.1
+  cuda                : 12.8
+
+  → Compute: GPU (NVIDIA GeForce RTX 5070 Ti, 17.1GB)
+  → CUDA   : 12.8
+
+  → Running 6/6 steps
+
+
+=================================================================
+  STEP : Step 1 — Baseline Eval (BM25/TF-IDF/GNN/Struct-Filter, N=12991)
+  File : baseline_eval.py
+  Time : 2026-06-20 16:52:53
+  GPU  : CUDA:0
+=================================================================
+[CONFIG] eval_size=500 | output=D:\TTT\CD3\results\baseline_comparison.csv
+============================================================
+  Wine Recommendation — Baseline Evaluation (11 methods)
+============================================================
+
+============================================================
+Loading catalog: D:\TTT\CD3\data\processed\wine_catalog_semantic.csv
+  Catalog : 129,907 wines | Unique IDs: 129,907
+
+Loading test data...
+  Test queries: 500
+
+────────────────────────────────────────────────────────────
+METHOD 1: BM25 (Okapi, k1=1.2 b=0.65 — tuned for wine vocab)
+  Index: 1.8s
+
+────────────────────────────────────────────────────────────
+METHOD 2: BM25+ Enhanced (variety/country fields repeated ×3)
+  Index: 1.6s
+
+────────────────────────────────────────────────────────────
+METHOD 3: TF-IDF Content-Based CF (max_feat=50k, ngram(1,2))
+  Matrix: (129907, 50000)  |  built: 7.6s
+
+────────────────────────────────────────────────────────────
+METHOD 4: TF-IDF + LSA (SVD 200 dims, Latent Semantic Analysis)
+  LSA shape: (129907, 200)  |  built: 23.2s
+
+────────────────────────────────────────────────────────────
+Building shared indexes for Hybrid method...
+
+────────────────────────────────────────────────────────────
+METHOD 5: Hybrid BM25 + TF-IDF (0.5 × BM25_norm + 0.5 × TF-IDF cosine)
+
+────────────────────────────────────────────────────────────
+METHOD 6: Popularity-Based (country+variety frequency rank)
+
+────────────────────────────────────────────────────────────
+METHOD 7: Random Baseline (lower bound reference)
+
+────────────────────────────────────────────────────────────
+METHOD 8: Structured Filter + TF-IDF (country+variety hard filter)
+  Addresses root cause: region code never in query → filter first
+  Full index: (129907, 80000)  |  built: 7.7s
+  Queries filtered by country+variety: 444/500 (88.8%)
+
+────────────────────────────────────────────────────────────
+METHOD 9: Structured Filter + BM25 (within country+variety group)
+  Full BM25 index: 1.9s
+
+────────────────────────────────────────────────────────────
+METHOD 10: Structured Filter + Price Re-rank (budget proximity)
+  TF-IDF fallback index: 7.7s
+
+────────────────────────────────────────────────────────────
+METHOD 11: GNN-Enhanced Retrieval (LightGCN Embeddings)
+  ERROR: GNN files not found. Run gnn_indexer.py first.
+
+============================================================
+  BASELINE EVALUATION RESULTS
+  Eval size=500 | K=[1, 5, 10]
+============================================================
+Method                           Recall@1       NDCG@1IntentMatch@1     Recall@5       NDCG@5IntentMatch@5    Recall@10      NDCG@10IntentMatch@10          MRR   Latency_ms
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+BM25                               0.0060       0.0060       0.0680       0.0140       0.0095       0.2500       0.0260       0.0134       0.3740       0.0097     205.7336
+BM25+ Enhanced                     0.0080       0.0080       0.1140       0.0240       0.0157       0.3640       0.0380       0.0201       0.4980       0.0148     294.3567
+TF-IDF CF                          0.0000       0.0000       0.0740       0.0080       0.0048       0.2720       0.0180       0.0079       0.4120       0.0048       1.1371
+TF-IDF + LSA                       0.0000       0.0000       0.1080       0.0000       0.0000       0.2780       0.0060       0.0019       0.3800       0.0008       0.3620
+Hybrid BM25+TF-IDF                 0.0060       0.0060       0.0660       0.0120       0.0093       0.2540       0.0220       0.0125       0.3920       0.0096     207.8062
+Popularity-Based                   0.0000       0.0000       0.0060       0.0000       0.0000       0.0160       0.0000       0.0000       0.0400       0.0000      12.1488
+Random Baseline                    0.0000       0.0000       0.0100       0.0000       0.0000       0.0300       0.0000       0.0000       0.0620       0.0000       0.0020
+Struct-Filter TF-IDF               0.0040       0.0040       0.0880       0.0080       0.0063       0.2740       0.0180       0.0094       0.4420       0.0069     132.7448
+Struct-Filter BM25                 0.0060       0.0060       0.0680       0.0140       0.0095       0.2500       0.0260       0.0134       0.3740       0.0097     209.7085
+Struct-Filter+Price                0.0040       0.0040       0.0880       0.0080       0.0063       0.2740       0.0180       0.0094       0.4420       0.0069     135.0874
+GNN-Filter                         0.0000       0.0000       0.0000       0.0000       0.0000       0.0000       0.0000       0.0000       0.0000       0.0000       0.0000
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  ✅ Saved: D:\TTT\CD3\results\baseline_comparison.csv
+  Next: run base_rag_eval.py --update_baseline then merge_results.py
+
+
+  → OK in 668.6s (exit 0)
+
+=================================================================
+  STEP : Step 2 — Model 1: TIGER + Constrained Beam Search + Price Rerank
+  File : constrained_eval.py
+  Time : 2026-06-20 17:04:01
+  GPU  : CUDA:0
+=================================================================
+[STDERR]
+usage: constrained_eval.py [-h] [--test_file TEST_FILE]
+                           [--catalog_file CATALOG_FILE]
+                           [--eval_size EVAL_SIZE] [--batch_size BATCH_SIZE]
+                           [--max_new_tokens MAX_NEW_TOKENS]
+                           [--num_beams NUM_BEAMS]
+                           [--num_return_sequences NUM_RETURN_SEQUENCES]
+                           [--output OUTPUT] [--mock]
+constrained_eval.py: error: unrecognized arguments: --n_samples 500
+
+  → FAILED in 0.4s (exit 2)
+
+=================================================================
+  STEP : Step 3 — Model 2: LLM Parser → Struct Filter → Sommelier (N=12991)
+  File : eval_model2_full.py
+  Time : 2026-06-20 17:04:02
+  GPU  : CUDA:0
+=================================================================
+============================================================
+  Evaluating Model 2 (Parser-Filter-Sommelier) on FULL Test Set
+  Total Test Samples: 12,991
+============================================================
+Loading catalog...
+Grouping catalog by country and variety names...
+Pre-building FastBM25 fallback index...
+Loading test set...
+Loaded 12,991 test samples.
+
+======================================================================
+           MODEL 2 (PARSER-FILTER) FULL TEST SET REPORT (N=12,991)
+======================================================================
+Recall@1  :   10.0300%
+Recall@5  :   27.9501%
+Recall@10 :   39.4196%
+NDCG@10   :   22.8628%
+MRR       :   17.7948%
+======================================================================
+Saved full evaluation report to: D:\TTT\CD3\results\model2_summary_full.csv
+
+
+  → OK in 24.8s (exit 0)
+
+=================================================================
+  STEP : Step 4 — Ablation Study (5 variants of Model 1)
+  File : ablation_eval.py
+  Time : 2026-06-20 17:04:27
+  GPU  : CUDA:0
+=================================================================
+============================================================
+  E4: Ablation Study
+============================================================
+Building TF-IDF index...
+  Evaluating: A1: LLM Greedy (no rerank)...
+    Recall@1=0.20%  Recall@10=0.20%  NDCG@10=0.20%
+  Evaluating: A2: Cluster Filter + Random...
+    Recall@1=0.00%  Recall@10=0.60%  NDCG@10=0.23%
+  Evaluating: A3: Cluster + Price Rerank (Ours)...
+    Recall@1=1.60%  Recall@10=5.60%  NDCG@10=3.40%
+  Evaluating: A4: Cluster + TF-IDF Rerank...
+    Recall@1=0.00%  Recall@10=1.00%  NDCG@10=0.40%
+  Evaluating: A5: Global Price Rerank...
+    Recall@1=0.00%  Recall@10=2.00%  NDCG@10=0.86%
+
+=== ABLATION STUDY RESULTS (N=500) ===
+                           Method  Recall@1  Recall@5  Recall@10  NDCG@10      MRR
+       A1: LLM Greedy (no rerank)       0.2       0.2        0.2 0.200000 0.200000
+      A2: Cluster Filter + Random       0.0       0.4        0.6 0.226599 0.115000
+A3: Cluster + Price Rerank (Ours)       1.6       4.6        5.6 3.402049 2.714365
+      A4: Cluster + TF-IDF Rerank       0.0       0.6        1.0 0.398277 0.218333
+          A5: Global Price Rerank       0.0       1.2        2.0 0.864746 0.518889
+
+Saved: D:\TTT\CD3\results\ablation_results.csv
+
+
+  → OK in 45.2s (exit 0)
+
+=================================================================
+  STEP : Step 5 — Cluster Match Analysis (Valid-ID Rate, Cluster Match@1)
+  File : cluster_eval.py
+  Time : 2026-06-20 17:05:12
+  GPU  : CUDA:0
+=================================================================
+============================================================
+  E1: Cluster-Only Recall Evaluation
+============================================================
+
+=== CLUSTER EVALUATION RESULTS (N=500) ===
+Valid ID Rate    : 99.60%
+Cluster Match@1  : 8.20%  (predicted C1-C2-C3 == target C1-C2-C3)
+Exact Match@1    : 0.2000%  (predicted full ID == target)
+Avg cluster size : 170.5 items per predicted cluster
+Theoretical max Recall@10 if cluster correct: 5.87%
+==========================================
+
+Saved: D:\TTT\CD3\results\cluster_eval_500.csv
+
+
+  → OK in 6.9s (exit 0)
+
+=================================================================
+  STEP : Step 6 — Noisy Query Benchmark (N=100, 3 categories)
+  File : noisy_query_benchmark.py
+  Time : 2026-06-20 17:05:19
+  GPU  : CUDA:0
+=================================================================
+Loading catalog...
+Pre-building BM25 fallback index...
+
+Running benchmark on 100 vague/noisy queries...
+
+=====================================================================================
+                  VAGUE & NOISY QUERY BENCHMARK REPORT (THREE-WAY)
+=====================================================================================
+Metric             | Struct-Filter BM25   | Model 1 (TIGER + Price)   | Model 2 (Parser-Filter)  
+-------------------------------------------------------------------------------------
+Recall@1           |               1.00% |                    7.00% |                    3.00%
+Recall@5           |               2.00% |                   26.00% |                    7.00%
+Recall@10          |               4.00% |                   39.00% |                    8.00%
+NDCG@10            |               2.04% |                   21.06% |                    5.22%
+=====================================================================================
+
+Saved benchmark results to: D:\TTT\CD3\results\noisy_query_benchmark_results.csv
+
+
+  → OK in 24.1s (exit 0)
+
+=================================================================
+  FINAL SUMMARY
+=================================================================
+  ✅ [OK     ] Step 1 — Baseline Eval (BM25/TF-IDF/GNN/Struct-Filte    668.6s
+  ❌ [FAILED ] Step 2 — Model 1: TIGER + Constrained Beam Search +       0.4s
+  ✅ [OK     ] Step 3 — Model 2: LLM Parser → Struct Filter → Somme     24.8s
+  ✅ [OK     ] Step 4 — Ablation Study (5 variants of Model 1)          45.2s
+  ✅ [OK     ] Step 5 — Cluster Match Analysis (Valid-ID Rate, Clus      6.8s
+  ✅ [OK     ] Step 6 — Noisy Query Benchmark (N=100, 3 categories)     24.1s
+
+  Total time : 12.8 min
+  Result     : SOME FAILED ❌
+  Log saved  : D:\TTT\CD3\results\run_logs\run_20260620_165252.log
+  Meta saved : D:\TTT\CD3\results\run_logs\run_20260620_165252_meta.json
