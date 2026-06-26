@@ -1,6 +1,6 @@
 ===============================================================================================
   EVALUATION LOG — REALISTIC MIXED NOISY QUERY TEST (HEAVY NOISE)
-  Generated: 2026-06-26 18:19:59
+  Generated: 2026-06-26 18:29:29
 ===============================================================================================
 
 DATASET
@@ -34,27 +34,27 @@ RESULTS — OVERALL (N=12,991)
 ----------------------------
   Method                           |     R@1 |     R@5 |    R@10 |  NDCG@10 |     MRR
   --------------------------------------------------------------------------------
-  TF-IDF CF                        |   0.02% |   0.08% |   0.12% |    0.06% |   0.04%
-  BM25                             |   0.02% |   0.06% |   0.15% |    0.07% |   0.04%
-  BM25+ Enhanced                   |   0.02% |   0.05% |   0.15% |    0.07% |   0.04%
-  Struct-Filter BM25               |   0.02% |   0.06% |   0.15% |    0.07% |   0.04%
-  GNN-Filter                       |   0.02% |   0.08% |   0.12% |    0.06% |   0.04%
+  TF-IDF CF                        |   0.01% |   0.08% |   0.14% |    0.06% |   0.04%
+  BM25                             |   0.05% |   0.13% |   0.22% |    0.12% |   0.08%
+  BM25+ Enhanced                   |   0.03% |   0.11% |   0.20% |    0.10% |   0.07%
+  Struct-Filter BM25               |   0.05% |   0.13% |   0.22% |    0.12% |   0.08%
+  GNN-Filter                       |   0.01% |   0.05% |   0.13% |    0.05% |   0.03%
   TIGER Greedy                     |   0.08% |   0.08% |   0.08% |    0.08% |   0.08%
-  Proposed Hybrid (Model 1)        |   1.38% |   3.36% |   4.10% |    2.64% |   2.18%
-  Proposed Model 2 (Ours)          |   3.80% |  10.38% |  15.00% |    8.66% |   6.72%
+  Proposed Hybrid (Model 1)        |   1.35% |   3.23% |   3.96% |    2.55% |   2.11%
+  Proposed Model 2 (Ours)          |   3.49% |   9.91% |  14.49% |    8.24% |   6.34%
 
 RESULTS — REALISTIC SHORT (50%, N=6,496)
 -----------------------------------------
   Method                           |     R@1 |    R@10 |  NDCG@10 |     MRR
   --------------------------------------------------------------------
-  TF-IDF CF                        |   0.05% |   0.17% |    0.10% |   0.08%
-  BM25                             |   0.03% |   0.25% |    0.11% |   0.07%
-  BM25+ Enhanced                   |   0.03% |   0.26% |    0.11% |   0.07%
-  Struct-Filter BM25               |   0.03% |   0.25% |    0.11% |   0.07%
-  GNN-Filter                       |   0.03% |   0.20% |    0.10% |   0.07%
+  TF-IDF CF                        |   0.02% |   0.22% |    0.10% |   0.06%
+  BM25                             |   0.09% |   0.40% |    0.21% |   0.16%
+  BM25+ Enhanced                   |   0.06% |   0.35% |    0.18% |   0.12%
+  Struct-Filter BM25               |   0.09% |   0.40% |    0.21% |   0.16%
+  GNN-Filter                       |   0.02% |   0.22% |    0.09% |   0.05%
   TIGER Greedy                     |   0.12% |   0.12% |    0.12% |   0.12%
-  Proposed Hybrid (Model 1)        |   2.03% |   6.00% |    3.88% |   3.22%
-  Proposed Model 2 (Ours)          |   4.59% |  17.89% |   10.42% |   8.13%
+  Proposed Hybrid (Model 1)        |   1.97% |   5.73% |    3.71% |   3.08%
+  Proposed Model 2 (Ours)          |   3.97% |  16.87% |    9.58% |   7.36%
 
 RESULTS — NOISED ORIGINAL (50%, N=6,495)
 -----------------------------------------
@@ -72,7 +72,7 @@ RESULTS — NOISED ORIGINAL (50%, N=6,495)
 CONCLUSION
 ----------
   Model 2 (Proposed Model 2) outperforms all baselines and Model 1 under heavily noised testing.
-  On realistic short queries: Recall@10 = 17.89% (vs Model 1 = 6.00%)
+  On realistic short queries: Recall@10 = 16.87% (vs Model 1 = 5.73%)
   On noised original queries: Recall@10 = 12.12% (vs Model 1 = 2.20%)
-  Overall Recall@10 = 15.00% vs Model 1 = 4.10% (3.66x improvement for Model 2)
+  Overall Recall@10 = 14.49% vs Model 1 = 3.96% (3.66x improvement for Model 2)
 ===============================================================================================
