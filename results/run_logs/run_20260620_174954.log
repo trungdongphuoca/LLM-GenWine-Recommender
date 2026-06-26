@@ -1,0 +1,32 @@
+=================================================================
+  EXPERIMENT RUN LOG
+  Project : LLM-GenWine-Recommender — Chuyen de 3
+  Run ID  : 20260620_174954
+  Log     : D:\TTT\CD3\results\run_logs\run_20260620_174954.log
+=================================================================
+
+[ENVIRONMENT]
+  run_id              : 20260620_174954
+  timestamp           : 2026-06-20T17:49:54.631808
+  platform            : Windows-10-10.0.26200-SP0
+  python              : 3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]
+  hostname            : DESKTOP-D9MM22F
+  seed                : 42
+  torch               : 2.11.0+cu128
+  cuda_available      : True
+  gpu                 : NVIDIA GeForce RTX 5070 Ti
+  vram_gb             : 17.1
+  cuda                : 12.8
+
+  → Compute: GPU (NVIDIA GeForce RTX 5070 Ti, 17.1GB)
+  → CUDA   : 12.8
+
+  → Running 6/6 steps
+
+
+=================================================================
+  STEP : Step 1 — Baseline Eval (BM25/TF-IDF/GNN/Struct-Filter, N=12991)
+  File : baseline_eval.py
+  Time : 2026-06-20 17:49:55
+  GPU  : CUDA:0
+=================================================================

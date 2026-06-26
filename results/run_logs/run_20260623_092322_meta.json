@@ -1,0 +1,97 @@
+{
+  "env": {
+    "run_id": "20260623_092322",
+    "timestamp": "2026-06-23T09:23:22.967190",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "hostname": "DESKTOP-D9MM22F",
+    "seed": 42,
+    "torch": "2.11.0+cu128",
+    "cuda_available": true,
+    "gpu": "NVIDIA GeForce RTX 5070 Ti",
+    "vram_gb": 17.1,
+    "cuda": "12.8"
+  },
+  "steps": [
+    {
+      "label": "Step 1 — Baseline Eval (BM25/TF-IDF/GNN/Struct-Filter, N=500)",
+      "script": "baseline_eval.py",
+      "elapsed_sec": 200.48,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Step 2 — Model 1: TIGER + Constrained Beam Search + Price Rerank (N=500)",
+      "script": "constrained_eval.py",
+      "elapsed_sec": 8.62,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Step 3 - Model 2: LLM Parser -> Struct Filter -> Sommelier (N=12991)",
+      "script": "eval_model2_full.py",
+      "elapsed_sec": 27.9,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Step 4 — Ablation Study (5 variants of Model 1, N=12991)",
+      "script": "ablation_eval.py",
+      "elapsed_sec": 3.63,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Step 5 — Cluster Match Analysis (Valid-ID Rate, Cluster Match@1, N=12991)",
+      "script": "cluster_eval.py",
+      "elapsed_sec": 1.73,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Step 6 — Noisy Query Benchmark (N=100, 3 categories)",
+      "script": "noisy_query_benchmark.py",
+      "elapsed_sec": 26.06,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Step 7 — Sapo Ablation Study (5 methods, Leave-One-Out, N=150)",
+      "script": "sapo_ablation.py",
+      "elapsed_sec": 9.41,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Merge Baseline & Proposed Model 2 Results",
+      "script": "merge_results.py",
+      "elapsed_sec": 0.35,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Plot Comparison Charts",
+      "script": "plot_comprehensive.py",
+      "elapsed_sec": 1.7,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Plot Sapo Comparison Charts",
+      "script": "plot_sapo_comparison.py",
+      "elapsed_sec": 1.17,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Generate Thesis Word Document (.docx)",
+      "script": "generate_docx.py",
+      "elapsed_sec": 0.59,
+      "returncode": 0,
+      "status": "OK"
+    }
+  ],
+  "log_file": "D:\\TTT\\CD3\\results\\run_logs\\run_20260623_092322.log",
+  "all_ok": true,
+  "total_sec": 281.6
+}

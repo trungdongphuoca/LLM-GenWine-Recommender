@@ -13,14 +13,36 @@ Hệ thống gợi ý rượu vang kết hợp **Generative Retrieval** (TIGER f
 - **Winemag-130K**: 129,915 chai rượu vang quốc tế → đánh giá Cold-Start
 - **Sapo (Việt Nam)**: 305 sản phẩm, 400+ khách hàng → đánh giá Warm-Start
 
-### Kết quả chính
+### Kết quả chính — Tập test chuẩn (N=12,991, Cold-Start)
 
-| Phương pháp | Recall@1 | Recall@10 | NDCG@10 | Latency |
-|---|---|---|---|---|
-| BM25 Baseline | 0.80% | 2.60% | 1.34% | 238ms |
-| BM25+ Enhanced | 0.80% | 3.80% | 2.01% | 339ms |
-| **TIGER + Price Rerank (Đề xuất)** | **1.60%** | **5.60%** | **3.40%** | 2,278ms |
-| Sapo CF (Warm-Start) | 56.00% | **81.33%** | 68.52% | <1ms |
+| Phương pháp | Recall@1 | Recall@10 | NDCG@10 | MRR | Latency |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| TF-IDF CF | 0.31% | 2.59% | 1.23% | 0.82% | 1.1ms |
+| BM25 | 1.07% | 5.54% | 2.95% | 2.17% | 1.5ms |
+| BM25+ Enhanced | 7.31% | 14.45% | 11.06% | 9.94% | 1.6ms |
+| Struct-Filter BM25 | 7.39% | 14.84% | 11.31% | 10.15% | 1.4ms |
+| GNN-Filter | 0.21% | 1.71% | 0.80% | 0.53% | 1.1ms |
+| TIGER Greedy | 0.15% | 0.15% | 0.15% | 0.15% | 2,278ms |
+| Model 1 — TIGER + Price Rerank | 2.42% | 7.76% | 4.87% | 3.97% | 15,703ms |
+| **Model 2 — Parser-Filter-Sommelier** | **10.03%** | **39.42%** | **22.86%** | **17.79%** | **86.6ms** |
+
+### 🔥 Noisy Realistic Mixed Benchmark (N=12,991 — truy vấn nhiễu thực tế)
+
+> 50% Nhóm A: câu hỏi từ tập test bị gây nhiễu nặng (xóa giống nho, sai chính tả).  
+> 50% Nhóm B: câu hỏi ngắn 7–10 từ thực tế từ kinh nghiệm bán hàng (không dùng tên giống nho).
+
+| Phương pháp | Recall@1 | Recall@10 | NDCG@10 | MRR |
+|:---|:---:|:---:|:---:|:---:|
+| TF-IDF CF | 0.06% | 0.69% | 0.32% | 0.21% |
+| BM25 | 0.18% | 0.79% | 0.44% | 0.34% |
+| Struct-Filter BM25 | 0.18% | 0.79% | 0.44% | 0.34% |
+| TIGER Greedy | 8.51% | 8.51% | 8.51% | 8.51% |
+| Model 2 — Parser-Filter-Sommelier | 4.98% | 20.87% | 11.83% | 9.08% |
+| **Model 1 — TIGER + Price Rerank** | **33.49%** | **75.84%** | **54.42%** | **47.56%** |
+
+> 📁 Kết quả đầy đủ: [`results/noisy_query_12k_all_models_results.csv`](results/noisy_query_12k_all_models_results.csv)  
+> 📄 Báo cáo chi tiết: [`results/noisy_realistic_evaluation_report.docx`](results/noisy_realistic_evaluation_report.docx)  
+> 📝 Log đánh giá: [`results/run_logs/run_noisy_query_all_models.log`](results/run_logs/run_noisy_query_all_models.log)
 
 ---
 

@@ -1,0 +1,55 @@
+{
+  "env": {
+    "run_id": "20260623_082928",
+    "timestamp": "2026-06-23T08:29:28.873156",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "hostname": "DESKTOP-D9MM22F",
+    "seed": 42,
+    "torch": "2.11.0+cu128",
+    "cuda_available": true,
+    "gpu": "NVIDIA GeForce RTX 5070 Ti",
+    "vram_gb": 17.1,
+    "cuda": "12.8"
+  },
+  "steps": [
+    {
+      "label": "Step 7 — Sapo Ablation Study (5 methods, Leave-One-Out, N=150)",
+      "script": "sapo_ablation.py",
+      "elapsed_sec": 12.59,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Merge Baseline & Proposed Model 2 Results",
+      "script": "merge_results.py",
+      "elapsed_sec": 0.37,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Plot Comparison Charts",
+      "script": "plot_comprehensive.py",
+      "elapsed_sec": 1.74,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Plot Sapo Comparison Charts",
+      "script": "plot_sapo_comparison.py",
+      "elapsed_sec": 1.24,
+      "returncode": 0,
+      "status": "OK"
+    },
+    {
+      "label": "Post-Step: Generate Thesis Word Document (.docx)",
+      "script": "generate_docx.py",
+      "elapsed_sec": 0.57,
+      "returncode": 0,
+      "status": "OK"
+    }
+  ],
+  "log_file": "D:\\TTT\\CD3\\results\\run_logs\\run_20260623_082928.log",
+  "all_ok": true,
+  "total_sec": 16.5
+}
