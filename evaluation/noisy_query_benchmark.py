@@ -306,7 +306,78 @@ class NoisyQueryBenchmark:
             
         return df["Semantic_ID"].head(K).tolist()
 
+    def print_data_distribution(self, targets):
+        # 1. Category breakdown
+        # Category 1: 0-33, Category 2: 34-66, Category 3: 67-99
+        cats = []
+        for i in range(len(BENCHMARK_QUERIES)):
+            if i < 34: cats.append("Misspellings & Slang (Noisy)")
+            elif i < 67: cats.append("Vague Styles (Vague)")
+            else: cats.append("Implicit Food Pairings (Implicit)")
+        cat_counts = pd.Series(cats).value_counts()
+        
+        # 2. Country breakdown
+        countries = [q['country'] for q in BENCHMARK_QUERIES]
+        country_counts = pd.Series(countries).value_counts()
+        
+        # 3. Variety breakdown
+        varieties = [q['variety'] for q in BENCHMARK_QUERIES]
+        variety_counts = pd.Series(varieties).value_counts()
+        
+        # 4. Price breakdown
+        prices = [q['price'] for q in BENCHMARK_QUERIES]
+        price_bins = pd.cut(prices, bins=[0, 20, 40, 60, 100], labels=["<$20", "$20-$40", "$40-$60", ">$60"])
+        price_counts = pd.Series(price_bins).value_counts().sort_index()
+        
+        # 5. Cluster coverage
+        target_clusters = [t['Semantic_ID_Cluster'] for t in targets]
+        unique_clusters = set(target_clusters)
+        total_clusters = self.cat['Semantic_ID_Cluster'].nunique()
+        
+        print("\n" + "="*85)
+        print("        BENCHMARK DATASET COVERAGE & DISTRIBUTION ANALYSIS (N=100)")
+        print("="*85)
+        print("1. QUERY CATEGORIES:")
+        for k, v in cat_counts.items():
+            print(f"   - {k:<40}: {v:>3} queries ({v/100:.1%})")
+            
+        print("\n2. COUNTRY COVERAGE (12 Countries):")
+        c_items = list(country_counts.items())
+        for idx in range(0, len(c_items), 2):
+            left = f"   - {c_items[idx][0]:<15}: {c_items[idx][1]:>2} ({c_items[idx][1]/100:.1%})"
+            right = ""
+            if idx + 1 < len(c_items):
+                right = f"   - {c_items[idx+1][0]:<15}: {c_items[idx+1][1]:>2} ({c_items[idx+1][1]/100:.1%})"
+            print(f"{left:<40}{right}")
+            
+        print("\n3. PRICE DISTRIBUTION:")
+        print(f"   - Range : ${min(prices):.1f} to ${max(prices):.1f} (Median: ${np.median(prices):.1f})")
+        for k, v in price_counts.items():
+            print(f"   - {k:<15}: {v:>2} queries ({v/100:.1%})")
+            
+        print("\n4. GRAPE VARIETY COVERAGE (28 Varieties):")
+        v_items = list(variety_counts.items())
+        top_v = v_items[:8]
+        other_sum = sum(item[1] for item in v_items[8:])
+        for k, v in top_v:
+            print(f"   - {k:<25}: {v:>2} queries ({v/100:.1%})")
+        print(f"   - Others ({len(v_items)-8} varieties)     : {other_sum:>2} queries ({other_sum/100:.1%})")
+        
+        print("\n5. SEMANTIC CLUSTER COVERAGE:")
+        print(f"   - Unique target clusters: {len(unique_clusters)} distinct C1-C2-C3 clusters")
+        print(f"   - Ratio of cluster-level query coverage: {len(unique_clusters)} / {total_clusters} clusters ({len(unique_clusters)/total_clusters:.2%})")
+        print("="*85)
+
     def run_benchmark(self):
+        # First find target wines for all queries to analyze distributions
+        targets = []
+        for item in BENCHMARK_QUERIES:
+            tgt = self.find_target_wine(item["variety"], item["country"], item["price"])
+            targets.append(tgt)
+            
+        # Print dataset coverage & distribution analysis
+        self.print_data_distribution(targets)
+        
         print(f"\nRunning benchmark on {len(BENCHMARK_QUERIES)} vague/noisy queries...")
         
         bm25_records = []
@@ -315,11 +386,7 @@ class NoisyQueryBenchmark:
         
         for idx, item in enumerate(BENCHMARK_QUERIES):
             query = item["query"]
-            variety = item["variety"]
-            country = item["country"]
-            price = item["price"]
-            
-            target_wine = self.find_target_wine(variety, country, price)
+            target_wine = targets[idx]
             target_id = target_wine["Semantic_ID"]
             
             bm25_rec = self.run_struct_filter_bm25(query, target_id)
