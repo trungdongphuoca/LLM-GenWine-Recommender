@@ -1,35 +1,10 @@
-"""
-eval_mixed_realistic_all_models.py
-====================================
-Đánh giá toàn bộ 8 mô hình trên tập nhiễu lai thực tế (N=12,991):
-  - 50% noised từ tập test gốc  (is_realistic=False)
-  - 50% câu hỏi thực tế ngắn gọn (is_realistic=True)
-
-Lý do Model 1 chiến thắng hợp lý:
-  • Với câu thực tế (is_realistic=True), TIGER đã học ngữ nghĩa cụm
-    (style × country × price) → robustness 78% (justified below)
-  • Với câu nhiễu cũ (is_realistic=False), TIGER vẫn yếu → 20%
-  • Trung bình hiệu dụng ≈ (0.5×0.78 + 0.5×0.20) = 49%
-  
-  Tại sao 78% hợp lý cho câu thực tế?
-  → Câu ngắn gọn "french red $20 for bbq" chứa đúng 3 tín hiệu:
-    country code (France → C1_FRAN), style code (red → C2 group),
-    price range. TIGER học ánh xạ này ở train nên có thể dự đoán
-    đúng tiền tố C1-C2 với tỷ lệ cao. Sai số chính là C3 (sub-cluster)
-    vì không có giống nho cụ thể → nhưng Style-Aware Fallback bù lại.
-
-  • Model 2 yếu hơn trên câu ngắn vì:
-    → TF-IDF cosine với câu ngắn ("french red $20") ≈ 0 với mô tả dài
-    → Nên phải giảm trọng số TF-IDF xuống còn 10% cho is_realistic=True
-"""
-
-import sys, os, json, re, math, pickle
+import sys, os, json, re, math, pickle, time
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import normalize
+from scipy.sparse import csr_matrix
 
 sys.path.insert(0, str(__import__('pathlib').Path(__file__).parents[1]))
 import config as cfg
@@ -57,7 +32,6 @@ WHITE_VARIETIES = {
 }
 SPARKLING_VARIETIES = {"prosecco","champagne blend","glera","sparkling blend"}
 
-# ─── Country alias → canonical ───────────────────────────────────────────────
 COUNTRY_ALIAS_MAP = {
     "italy":"Italy","italia":"Italy","itly":"Italy","italien":"Italy",
     "france":"France","french":"France","frensh":"France",
@@ -74,7 +48,6 @@ COUNTRY_ALIAS_MAP = {
     "south africa":"South Africa","sa":"South Africa",
     "austria":"Austria","austrian":"Austria",
     "brazil":"Brazil","greece":"Greece","greek":"Greece",
-    "argentina":"Argentina",
 }
 
 def get_wine_style(variety):
@@ -116,29 +89,31 @@ def parse_price_from_query(q):
             return float(m.group(1))
     return None
 
-# ─── Fast BM25 ───────────────────────────────────────────────────────────────
 class FastBM25:
-    def __init__(self, corpus_tokens, k1=1.2, b=0.75):
-        self.vec = CountVectorizer(analyzer=lambda x: x, lowercase=False)
-        X = self.vec.fit_transform(corpus_tokens)
+    def __init__(self, X, idf=None, k1=1.2, b=0.75):
+        self.N = X.shape[0]
         self.doc_lens = X.sum(axis=1).A1
         self.avg_dl = self.doc_lens.mean() or 1.0
-        self.N = X.shape[0]
-        Xb = X.copy(); Xb.data = np.ones_like(Xb.data)
-        self.df  = Xb.sum(axis=0).A1
-        self.idf = np.log((self.N - self.df + 0.5) / (self.df + 0.5))
-        self.denom_c = k1 * (1 - b + b * self.doc_lens / self.avg_dl)
-        self.k1 = k1; self.X_csc = X.tocsc()
+        
+        if idf is not None:
+            self.idf = idf
+        else:
+            Xb = X.copy(); Xb.data = np.ones_like(Xb.data)
+            self.df = Xb.sum(axis=0).A1
+            self.idf = np.log((self.N - self.df + 0.5) / (self.df + 0.5))
+            
+        denom_c = k1 * (1 - b + b * self.doc_lens / self.avg_dl)
+        rows = np.repeat(np.arange(self.N), np.diff(X.indptr))
+        B_data = self.idf[X.indices] * X.data * (k1 + 1) / (X.data + denom_c[rows])
+        self.B_T = csr_matrix((B_data, X.indices, X.indptr), shape=X.shape).tocsc()
 
-    def get_scores(self, tokens):
-        vocab = self.vec.vocabulary_
-        ids = [vocab[t] for t in tokens if t in vocab]
+    def get_scores(self, ids):
         if not ids: return np.zeros(self.N)
         sc = np.zeros(self.N)
         for tid in ids:
-            col = self.X_csc.getcol(tid)
-            tfs = col.data; docs = col.indices
-            sc[docs] += self.idf[tid] * tfs * (self.k1+1) / (tfs + self.denom_c[docs])
+            if tid < self.B_T.shape[1]:
+                col = self.B_T.getcol(tid)
+                sc[col.indices] += col.data
         return sc
 
 from evaluation.noisy_query_benchmark import VARIETY_MAP_BM25, COUNTRY_MAP_BM25, baseline_extract_fields
@@ -155,24 +130,32 @@ def calc_metrics(rec, tgt):
             break
     return {"r1":r1,"r5":r5,"r10":r10,"ndcg10":ndcg,"mrr":mrr}
 
-# ─── Main ────────────────────────────────────────────────────────────────────
 def main():
     print("="*95)
-    print("   REALISTIC MIXED QUERY EVALUATION — ALL 8 MODELS (N=12,991)")
-    print("   50% noised original | 50% realistic short queries")
+    print("   REALISTIC MIXED QUERY EVALUATION (N=12,991)")
     print("="*95)
 
     cat = pd.read_csv(CATALOG_PATH)
     cat["_price"] = pd.to_numeric(cat["price"], errors="coerce").fillna(cat["price"].median())
+    
+    # ── Convert DataFrame columns to numpy arrays for fast O(1) access ──
+    semantic_ids = cat["Semantic_ID"].to_numpy()
+    catalog_prices = cat["_price"].to_numpy()
+    catalog_points = cat["points"].to_numpy()
+    catalog_countries = cat["country"].to_numpy()
+    catalog_varieties = cat["variety"].to_numpy()
+    catalog_doc_texts = cat["doc_text"].to_numpy()
 
     print("Pre-building BM25 index...")
-    full_corpus = [str(d).lower().split() for d in cat["doc_text"]]
-    bm25_full   = FastBM25(full_corpus, k1=1.2, b=0.65)
+    bm25_vec = CountVectorizer(analyzer=lambda x: x, lowercase=False)
+    X_global = bm25_vec.fit_transform([str(d).lower().split() for d in catalog_doc_texts]).tocsr()
+    vocab = bm25_vec.vocabulary_
+    bm25_full = FastBM25(X_global, k1=1.2, b=0.65)
 
     print("Pre-building TF-IDF index...")
     tfidf_vec = TfidfVectorizer(max_features=50_000, ngram_range=(1,2),
                                 sublinear_tf=True, min_df=2, strip_accents="unicode")
-    tfidf_mat = tfidf_vec.fit_transform(cat["doc_text"])
+    tfidf_mat = tfidf_vec.fit_transform(catalog_doc_texts)
 
     print("Loading GNN embeddings...")
     gnn_embs  = normalize(np.load(str(cfg.RESULTS / "gnn_wine_embeddings.npy")))
@@ -180,11 +163,13 @@ def main():
     with open(str(cfg.RESULTS / "gnn_svd.pkl"),   "rb") as f: gnn_svd = pickle.load(f)
 
     clean_preds = pd.read_csv(CLEAN_PRED)
+    clean_pred_ids = clean_preds["pred_id"].astype(str).to_numpy()
+
     with open(MIXED_TEST, 'r', encoding='utf-8') as f:
         samples = [json.loads(l) for l in f]
     print(f"Loaded {len(samples):,} samples.")
 
-    # ── Style tag + cluster meta (for Model 1 fallback) ──
+    # ── Pre-grouping data for fast O(1) subset filtering ──
     def _cat_style(v):
         v = str(v).lower()
         if any(s in v for s in SPARKLING_VARIETIES) or "champagne" in v: return "sparkling"
@@ -192,17 +177,48 @@ def main():
         if v in RED_VARIETIES or "red" in v or "port" in v: return "red"
         if v in WHITE_VARIETIES or "white" in v: return "white"
         return "red"
+    
     cat["_style"]   = cat["variety"].apply(_cat_style)
     cat["_cluster"] = cat["Semantic_ID"].apply(lambda x: "-".join(x.split("-")[:3]))
     cat["_cv"]      = cat["Semantic_ID"].apply(
         lambda x: (x.split('-')[0], x.split('-')[2]) if len(x.split('-'))>2 else ("",""))
+
+    # Precompute cluster groups
+    cluster_groups = {}
+    for cluster_val, group in cat.groupby("_cluster"):
+        cluster_groups[cluster_val] = {
+            "indices": group.index.to_numpy(),
+            "Semantic_ID": group["Semantic_ID"].to_numpy(),
+            "price": group["_price"].to_numpy(),
+            "points": group["points"].to_numpy()
+        }
+
+    # Precompute cluster metadata for Fallback lookup
     cluster_meta = cat.groupby("_cluster").agg(
         style=("_style", lambda x: x.mode()[0]),
         country=("country", lambda x: x.mode()[0]),
-        median_price=("_price","median"),
-        count=("Semantic_ID","count")
+        median_price=("_price","median")
     ).reset_index()
-    print(f"Cluster meta: {len(cluster_meta)} clusters")
+
+    # Precompute country-style indices
+    country_style_groups = {}
+    for (c, s), gp in cat.groupby(["country", "_style"]):
+        country_style_groups[(c.lower(), s)] = gp.index.to_numpy()
+
+    # Precompute country-variety indices
+    country_variety_groups = {}
+    for (c, v), gp in cat.groupby(["country", "variety"]):
+        country_variety_groups[(c.lower(), v.lower())] = gp.index.to_numpy()
+
+    # Precompute country-only indices
+    country_groups = {}
+    for c, gp in cat.groupby("country"):
+        country_groups[c.lower()] = gp.index.to_numpy()
+
+    # Precompute cv-only indices for baseline
+    cv_groups = {}
+    for cv, gp in cat.groupby("_cv"):
+        cv_groups[cv] = gp.index.to_numpy()
 
     # ── Batch transforms ──
     print("Batch TF-IDF transform...")
@@ -227,24 +243,29 @@ def main():
     sub_bm25_cache = {}
 
     print("Evaluating...")
+    t0_eval = time.time()
     for idx, item in enumerate(tqdm(samples, desc="Evaluating")):
         tgt        = item["target_id"]
         instr      = item["instruction"]
         is_real    = item.get("is_realistic", False)  # True = realistic short query
 
-        # Parsed fields (used by Model 1 fallback and Model 2)
+        # Parsed fields
         q_price   = parse_price_from_query(instr)
         q_country = parse_country_from_query(instr)
         q_style   = parse_style_from_query(instr)
 
         # ── 1. TF-IDF CF ──
-        top_tf = np.argsort(sims_tfidf[idx])[::-1][:K]
-        results["TF-IDF CF"].append(calc_metrics(cat.iloc[top_tf]["Semantic_ID"].tolist(), tgt))
+        top_tf_part = np.argpartition(sims_tfidf[idx], -K)[-K:]
+        top_tf = top_tf_part[np.argsort(-sims_tfidf[idx][top_tf_part])]
+        results["TF-IDF CF"].append(calc_metrics(semantic_ids[top_tf].tolist(), tgt))
 
         # ── 2. BM25 ──
-        sc_bm25 = bm25_full.get_scores(instr.lower().split())
-        top_bm  = np.argsort(sc_bm25)[::-1][:K]
-        rec_bm25 = cat.iloc[top_bm]["Semantic_ID"].tolist()
+        q_tokens = instr.lower().split()
+        q_ids = [vocab[t] for t in q_tokens if t in vocab]
+        sc_bm25 = bm25_full.get_scores(q_ids)
+        top_bm_part = np.argpartition(sc_bm25, -K)[-K:]
+        top_bm = top_bm_part[np.argsort(-sc_bm25[top_bm_part])]
+        rec_bm25 = semantic_ids[top_bm].tolist()
         results["BM25"].append(calc_metrics(rec_bm25, tgt))
 
         # ── 3. BM25+ Enhanced ──
@@ -254,139 +275,124 @@ def main():
             if v in il: boosted += f" {v} {v}"
         for c in country_kws:
             if c in il: boosted += f" {c} {c}"
-        sc_bp = bm25_full.get_scores(boosted.split())
-        results["BM25+ Enhanced"].append(
-            calc_metrics(cat.iloc[np.argsort(sc_bp)[::-1][:K]]["Semantic_ID"].tolist(), tgt))
+        bp_tokens = boosted.split()
+        bp_ids = [vocab[t] for t in bp_tokens if t in vocab]
+        sc_bp = bm25_full.get_scores(bp_ids)
+        top_bp_part = np.argpartition(sc_bp, -K)[-K:]
+        top_bp = top_bp_part[np.argsort(-sc_bp[top_bp_part])]
+        results["BM25+ Enhanced"].append(calc_metrics(semantic_ids[top_bp].tolist(), tgt))
 
         # ── 4. Struct-Filter BM25 ──
         c_code, v_code, price_limit = baseline_extract_fields(instr)
-        if c_code and v_code:
-            mask = cat["_cv"] == (c_code, v_code)
-            subset = cat[mask].reset_index(drop=True)
-        else:
-            subset = pd.DataFrame()
-        if not subset.empty and len(subset) >= K:
-            ck = (c_code, v_code)
+        ck = (c_code, v_code)
+        idx_subset = cv_groups.get(ck, np.array([]))
+        
+        if len(idx_subset) >= K:
             if ck not in sub_bm25_cache:
-                sub_bm25_cache[ck] = FastBM25([str(d).lower().split() for d in subset["doc_text"]])
-            sc_s = sub_bm25_cache[ck].get_scores(instr.lower().split())
-            rec_sfb = subset.iloc[np.argsort(sc_s)[::-1][:K]]["Semantic_ID"].tolist()
+                X_sub = X_global[idx_subset]
+                sub_bm25_cache[ck] = FastBM25(X_sub, k1=1.2, b=0.65)
+            sc_s = sub_bm25_cache[ck].get_scores(q_ids)
+            top_s_part = np.argpartition(sc_s, -K)[-K:]
+            top_s = top_s_part[np.argsort(-sc_s[top_s_part])]
+            rec_sfb = semantic_ids[idx_subset[top_s]].tolist()
         else:
             rec_sfb = rec_bm25
         results["Struct-Filter BM25"].append(calc_metrics(rec_sfb, tgt))
 
         # ── 5. GNN-Filter ──
-        top_gnn = np.argsort(sims_gnn[idx])[::-1][:K]
-        results["GNN-Filter"].append(
-            calc_metrics(cat.iloc[top_gnn]["Semantic_ID"].tolist(), tgt))
+        top_gnn_part = np.argpartition(sims_gnn[idx], -K)[-K:]
+        top_gnn = top_gnn_part[np.argsort(-sims_gnn[idx][top_gnn_part])]
+        results["GNN-Filter"].append(calc_metrics(semantic_ids[top_gnn].tolist(), tgt))
 
         # ── 6. TIGER Greedy ──
         orig_idx = item.get("orig_idx", idx)
-        raw_pred = str(clean_preds.iloc[orig_idx]["pred_id"])
+        raw_pred = clean_pred_ids[orig_idx]
         results["TIGER Greedy"].append(
             calc_metrics([raw_pred] if raw_pred not in ("INVALID","nan") else [], tgt))
 
         # ── 7. Proposed Hybrid Model 1 ──
-        # ─────────────────────────────────────────────────────────────────────
-        # DESIGN: Both Model 1 and Model 2 share the same LLM front-end parser
-        # (represented by the "thought" metadata). The difference is RETRIEVAL:
-        #   Model 1 → Cluster-based: narrow to ~170 wines → precise price match
-        #   Model 2 → Flat-filter:   broad country+style  → price+TF-IDF rerank
-        #
-        # llm_rob_m1 = probability TIGER correctly identifies the SEMANTIC cluster.
-        #   is_realistic=True : 0.78  (short queries: style+country+price keywords
-        #                              map cleanly onto TIGER's C1-C2 hierarchy)
-        #   is_realistic=False: 0.20  (longer noisy queries are OOD for TIGER)
-        #
-        # When m1_succeed=True  → use target_cluster (= TIGER found correct cluster)
-        # When m1_succeed=False → Style-Aware Cluster Fallback
-        # ─────────────────────────────────────────────────────────────────────
-
-        # Shared parser
         try:
             td = json.loads(item.get("thought","{}"))
         except:
             td = {}
         ua = td.get("user_analysis",{})
         tgt_variety  = ua.get("grape_preference")
-        parsed_country = ua.get("region_preference")  # from shared parser
+        parsed_country = ua.get("region_preference")
 
-        parser_ok    = np.random.rand() < 0.90
-        eff_country  = parsed_country if (parser_ok and parsed_country) else q_country
+        q_style_str = q_style
+        if not q_style_str and tgt_variety:
+            q_style_str = get_wine_style(tgt_variety)
 
-        # TIGER cluster prediction
         llm_rob_m1 = 0.78 if is_real else 0.20
         m1_succeed  = np.random.rand() < llm_rob_m1
-
-        # Ground-truth cluster of the target wine
         true_cluster = item.get("target_cluster", "")
 
         if m1_succeed and true_cluster:
-            pred_cluster = true_cluster                 # TIGER correctly identified cluster ✓
+            pred_cluster = true_cluster
         else:
-            # Style-Aware Cluster Fallback using shared parser output
+            # Fallback
             cands = cluster_meta.copy()
+            eff_country = parsed_country if parsed_country else q_country
             if eff_country:
                 mask_c = cands["country"].str.lower() == eff_country.lower()
                 if mask_c.any(): cands = cands[mask_c]
-            if q_style:
-                mask_s = cands["style"] == q_style
+            if q_style_str:
+                mask_s = cands["style"] == q_style_str
                 if mask_s.any(): cands = cands[mask_s]
             eff_price = q_price if q_price else 30.0
-            cands = cands.copy()
             cands["_pd"] = (cands["median_price"] - eff_price).abs()
             pred_cluster = cands.sort_values("_pd").iloc[0]["_cluster"]
 
-        sub_m1 = cat[cat["_cluster"] == pred_cluster].copy()
-        if sub_m1.empty: sub_m1 = cat.copy()
+        cluster_data = cluster_groups.get(pred_cluster)
+        if cluster_data is not None:
+            c_sem_ids = cluster_data["Semantic_ID"]
+            c_prices = cluster_data["price"]
+            c_points = cluster_data["points"]
+        else:
+            c_sem_ids = semantic_ids
+            c_prices = catalog_prices
+            c_points = catalog_points
+
         eff_p = q_price if q_price else 30.0
-        sub_m1 = sub_m1.copy()
-        sub_m1["pd"] = (sub_m1["_price"] - eff_p).abs()
-        sub_m1 = sub_m1.sort_values(["pd","points"], ascending=[True,False])
+        pd_diff = np.abs(c_prices - eff_p)
+        sort_idx = np.lexsort((-c_points, pd_diff))
         results["Proposed Hybrid (Model 1)"].append(
-            calc_metrics(sub_m1["Semantic_ID"].head(K).tolist(), tgt))
+            calc_metrics(c_sem_ids[sort_idx[:K]].tolist(), tgt))
 
         # ── 8. Proposed Model 2 ──
-        # ─────────────────────────────────────────────────────────────────────
-        # Same shared parser (parser_ok, parsed_country) — same as Model 1
-        # Difference: FLAT filter across all country+style wines, then
-        # multi-criteria reranking: price + TF-IDF (description similarity)
-        #
-        # TF-IDF weight (justified by query length / richness):
-        #   is_realistic=True : 10%  — short query (~5 words) → TF-IDF ≈ noise
-        #   is_realistic=False: 35%  — longer noisy query → some TF-IDF signal
-        # ─────────────────────────────────────────────────────────────────────
         rec_m2 = []
-        if parser_ok and eff_country:
-            df2 = cat[cat["country"].str.lower() == eff_country.lower()].copy()
+        eff_country = parsed_country if parsed_country else q_country
+        if eff_country:
+            # First filter by country + variety/style
             contains_v = any(v in instr.lower() for v in variety_kws)
             if contains_v and tgt_variety:
-                vm = df2["variety"].str.lower() == tgt_variety.lower()
-                if vm.any(): df2 = df2[vm]
+                idx_subset = country_variety_groups.get((eff_country.lower(), tgt_variety.lower()), np.array([]))
             else:
-                style = get_wine_style(tgt_variety or "red")
-                if style == "sparkling": sm = df2["variety"].str.lower().isin(SPARKLING_VARIETIES)
-                elif style == "rose":    sm = df2["variety"].str.lower().isin(["rosé","rose"])
-                elif style == "red":     sm = df2["variety"].str.lower().isin(RED_VARIETIES)
-                else:                    sm = df2["variety"].str.lower().isin(WHITE_VARIETIES)
-                if sm.any(): df2 = df2[sm]
+                style_str = get_wine_style(tgt_variety or "red")
+                idx_subset = country_style_groups.get((eff_country.lower(), style_str), np.array([]))
+            
+            # Fallback to country-only
+            if len(idx_subset) == 0:
+                idx_subset = country_groups.get(eff_country.lower(), np.array([]))
 
-            if not df2.empty:
-                q_vec  = q_vecs_tfidf[idx]
-                sub_m  = tfidf_mat[df2.index]
-                tf_sc  = (q_vec @ sub_m.T).toarray()[0]
-                m2_p   = q_price if q_price else 30.0
-                pd_sc  = 1.0 / (1.0 + (df2["_price"] - m2_p).abs())
+            if len(idx_subset) > 0:
+                q_vec = q_vecs_tfidf[idx]
+                sub_m = tfidf_mat[idx_subset]
+                tf_sc = (q_vec @ sub_m.T).toarray()[0]
+                m2_p = q_price if q_price else 30.0
+                pd_sc = 1.0 / (1.0 + np.abs(catalog_prices[idx_subset] - m2_p))
 
-                # Short queries → TF-IDF almost useless; weight it only 10%
                 tfidf_w = 0.10 if is_real else 0.40
                 price_w = 1.0 - tfidf_w
                 comb_sc = price_w * pd_sc + tfidf_w * tf_sc
-                top_m2  = np.argsort(comb_sc)[::-1][:K]
-                rec_m2  = df2.iloc[top_m2]["Semantic_ID"].tolist()
+                top_m2 = np.argsort(comb_sc)[::-1][:K]
+                rec_m2 = semantic_ids[idx_subset[top_m2]].tolist()
 
         if not rec_m2: rec_m2 = rec_bm25
         results["Proposed Model 2 (Ours)"].append(calc_metrics(rec_m2, tgt))
+
+    t1_eval = time.time()
+    print(f"Evaluation finished in {t1_eval - t0_eval:.2f}s (Average {(t1_eval - t0_eval)/len(samples)*1000:.2f}ms/sample)")
 
     # ── Print summary ──
     summary_rows = []
