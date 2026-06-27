@@ -603,7 +603,7 @@ Bảng 4.2 So sánh hiệu năng gợi ý (N=12.991)
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
 | TF-IDF CF | 0.31% | 1.28% | 2.59% | 1.23% | 0.82% | 1.1ms |
 | BM25 | 1.07% | 3.53% | 5.54% | 2.95% | 2.17% | 1.5ms |
-| BM25+ Enhanced | 7.31% | 13.69% | 14.45% | 11.06% | 9.94% | 1.6ms |
+| BM25+ Enhanced | 7.31% | 13.69% | 14.45% | 11.06% | 9.93.33% | 1.6ms |
 | Struct-Filter BM25 | 7.39% | 14.02% | 14.84% | 11.31% | 10.15% | 1.4ms |
 | GNN-Filter | 0.21% | 0.90% | 1.71% | 0.80% | 0.53% | 1.1ms |
 | TIGER Greedy | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 2,278ms |
@@ -858,7 +858,7 @@ Kết luận cốt lõi về thiết kế hệ thống thực tiễn:
 Nghiên cứu đề xuất chiến lược gợi ý lai linh hoạt tự động chuyển đổi dựa trên trạng thái của người dùng để tối ưu hóa hiệu năng:
 
 1. **Đối với người dùng mới (Cold-Start):** Khi hệ thống chưa có dữ liệu tương tác lịch sử trên đồ thị, hệ thống sẽ kích hoạt **Mô hình 2 gốc (Original Model 2)**. Mô hình này hoàn toàn không phụ thuộc vào GNN, mà tập trung phân tích các ràng buộc cấu trúc từ câu lệnh của người dùng (giống nho, quốc gia, mức giá) kết hợp với đánh giá chất lượng sản phẩm (`points`) và khoảng cách giá. Chiến lược này giúp đạt hiệu năng vượt trội trên tập kiểm thử Winemag (Cold-Start hoàn toàn) với **Recall@10 = 39.42%**, vượt qua toàn bộ các mô hình baseline khác.
-2. **Đối với người dùng cũ (Warm-Start):** Khi người dùng đã có lịch sử giao dịch (như bộ dữ liệu Sapo), hệ thống sẽ sử dụng phiên bản **Model 2 cải tiến bổ trợ bởi GNN**. Khi đó, các thuộc tính nhúng (embeddings) được học bởi mạng đồ thị LightGCN (GNN-Filter) sẽ đóng vai trò là vector chỉ dẫn cá nhân hóa, giúp chấm điểm độ tương đồng tương tác lịch sử kết hợp cùng bộ lọc thuộc tính. Điều này giúp nâng hiệu năng Recall@10 đạt mức tối ưu tuyệt đối **94.00%** trên tập dữ liệu Sapo (tăng từ **39.42%** của cold-start lên **94.00%** nhờ sự bổ trợ của tín hiệu cộng tác đồ thị).
+2. **Đối với người dùng cũ (Warm-Start):** Khi người dùng đã có lịch sử giao dịch (như bộ dữ liệu Sapo), hệ thống sẽ sử dụng phiên bản **Model 2 cải tiến bổ trợ bởi GNN**. Khi đó, các thuộc tính nhúng (embeddings) được học bởi mạng đồ thị LightGCN (GNN-Filter) sẽ đóng vai trò là vector chỉ dẫn cá nhân hóa, giúp chấm điểm độ tương đồng tương tác lịch sử kết hợp cùng bộ lọc thuộc tính. Điều này giúp nâng hiệu năng Recall@10 đạt mức tối ưu tuyệt đối **93.33%** trên tập dữ liệu Sapo (tăng từ **39.42%** của cold-start lên **93.33%** nhờ sự bổ trợ của tín hiệu cộng tác đồ thị).
 
 Sự kết hợp linh hoạt này đảm bảo hệ thống có khả năng hoạt động ổn định và chính xác trong mọi kịch bản vận hành thực tế:
 - Có lịch sử mua hàng (warm-start) -> Dùng Model 2 kết hợp GNN bổ trợ.
