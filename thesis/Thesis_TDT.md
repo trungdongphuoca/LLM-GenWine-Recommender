@@ -266,7 +266,7 @@ Phạm vi nghiên cứu của đề tài giới hạn trong:
 
 Luận văn áp dụng các phương pháp nghiên cứu khoa học sau:
 
-- Phương pháp lý thuyết: Nghiên cứu các tài liệu học thuật chính thống về hệ gợi ý, mô hình ngôn ngữ lớn, cơ chế tự chú ý (Self-Attention) và lý thuyết thông tin. Phân tích các mô hình baseline nổi tiếng như DSI của Google Research và LoRA của Microsoft.
+- Phương pháp lý thuyết: Nghiên cứu các tài liệu học thuật chính thống về hệ gợi ý, mô hình ngôn ngữ lớn, cơ chế tự chú ý (Self-Attention) và phương pháp truy xuất tạo sinh lấy cảm hứng từ TIGER.
 
 - Phương pháp thực nghiệm: Thiết kế và chạy các kịch bản huấn luyện tinh chỉnh mô hình trên tập dữ liệu chuẩn. Xây dựng môi trường đánh giá độc lập sử dụng 12.991 mẫu kiểm thử để đo lường chính xác các chỉ số Recall@K, NDCG@K, và MRR.
 
@@ -447,7 +447,7 @@ Mã định danh ngữ nghĩa trong Response **không phải là country-region-
 
 Cấu hình huấn luyện sử dụng QLoRA để lượng hóa mô hình gốc Llama-3-8B về dạng 4-bit NormalFloat (NF4) nhằm giảm bộ nhớ VRAM xuống dưới 10GB. Các tham số LoRA được thiết lập với hạng $r=16$, hệ số scaling $\alpha=16$, dropout=0, và áp dụng vào tất cả các lớp chiếu attention và FFN (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`). Tốc độ học được đặt ở mức $2 \times 10^{-4}$, batch size thực tế là 2 mẫu/thiết bị kết hợp tích lũy gradient 4 bước (batch hiệu dụng = 8). Mô hình được huấn luyện trên tập train gồm 103.925 mẫu.
 
-Trong quá trình suy luận (Inference), chúng tôi áp dụng cơ chế Constrained Beam Search. Tại mỗi bước sinh token tự hồi quy, mô hình chỉ được phép lựa chọn các token số nguyên hợp lệ tương ứng với cấu trúc cây phân cụm ngữ nghĩa đã xây dựng. Điều này giúp loại bỏ hoàn toàn các mã ID rác, đạt tỷ lệ mã ID hợp lệ là 99,61%.
+Trong quá trình suy luận (Inference), hệ thống áp dụng thuật toán tìm kiếm chùm (Beam Search) để sinh ra top-k chuỗi gợi ý, kết hợp với bộ kiểm thực và chuẩn hóa đầu ra (Output Validation & Fallback) bằng biểu thức chính quy (Regex) để trích xuất Semantic ID. Nhờ khả năng định dạng tốt của Llama-3 sau tinh chỉnh, tỷ lệ mã ID sinh ra đúng định dạng đạt tới 99,61%. Đối với các trường hợp mã ID không hợp lệ hoặc nằm ngoài danh mục, hệ thống sẽ kích hoạt cơ chế dự phòng Style-Aware Fallback để ánh xạ về cụm gần nhất.
 
 <!-- PAGE_BREAK -->
 
@@ -670,9 +670,13 @@ Bảng 4.3 Kết quả đánh giá Cluster Match
 | Tỷ lệ khớp cụm chi tiết (Cluster Match@1) | 9.67% |
 | Tỷ lệ khớp chai chính xác (Exact Match@1) | 0.15% |
 | Kích thước cụm chi tiết trung bình | 170.5 chai |
-| Giới hạn Recall@10 lý thuyết của cụm | 5.87% |
+| Tỷ lệ chọn ngẫu nhiên có điều kiện trong cụm (Conditional Random R@10) | 5.87% |
 
-Các số liệu trên Bảng 4.3 chỉ ra rằng: Llama-3-8B đạt tỷ lệ sinh mã ID đúng định dạng là 99,61%, chứng minh tính hiệu quả của cơ chế Constrained Decoding. Tỷ lệ khớp cụm chi tiết đạt 9,67% — cao gấp 64 lần so với tỷ lệ khớp chai chính xác (0.15%). Điều này xác nhận LLM đã học được cấu trúc phân cấp ngữ nghĩa của rượu vang, định vị đúng nhóm hương vị mục tiêu mặc dù sản phẩm kiểm thử là hoàn toàn mới (Cold-Start).
+Các số liệu trên Bảng 4.3 chỉ ra rằng: Llama-3-8B đạt tỷ lệ sinh mã ID đúng định dạng là 99,61%, chứng minh tính hiệu quả của cơ chế định dạng đầu ra. Tỷ lệ khớp cụm chi tiết đạt 9,67% — cao gấp 64 lần so với tỷ lệ khớp chai chính xác (0.15%). Điều này xác nhận LLM đã học được cấu trúc phân cấp ngữ nghĩa của rượu vang, định vị đúng nhóm hương vị mục tiêu mặc dù sản phẩm kiểm thử là hoàn toàn mới (Cold-Start).
+
+Đặc biệt, chỉ số chọn ngẫu nhiên có điều kiện trong cụm đạt 5,87% (tương ứng với việc chọn ngẫu nhiên 10 chai rượu trong một cụm có kích thước trung bình 170,5 chai). Nếu nhân xác suất khớp cụm chi tiết với xác suất chọn ngẫu nhiên trong cụm, ta thu được Expected Global Random Recall@10 là:
+$$0,0967 \times 0,0587 \approx 0,57\%$$
+Con số lý thuyết này hoàn toàn nhất quán và khớp với kết quả thực nghiệm của biến thể Cluster + Random trong phần ablation study (Recall@10 đạt 0,60%). Nó chứng minh rằng LLM thực sự định hướng tìm kiếm chùm hiệu quả vào không gian cụm ngữ nghĩa hẹp (giúp tăng cơ hội gợi ý đúng lên gấp hơn 74 lần so với việc đoán ngẫu nhiên trên toàn bộ catalog 130.000 chai rượu vốn có xác suất chọn ngẫu nhiên top-10 là $10/130.000 \approx 0,0077\%$).
 
 <!-- PAGE_BREAK -->
 
