@@ -72,14 +72,18 @@ print(f"Mode          : {'MOCK' if args.mock else 'REAL GPU'}")
 PROMPT_TEMPLATE = (
     "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n"
     "You are a Master Sommelier. Given a wine request, output the Semantic ID "
-    "of the best matching wine in square brackets (e.g. [US-NAPA-CABE-2015]), "
-    "then provide a brief explanation. Format: [SEMANTIC_ID] explanation."
+    "of the best matching wine in square brackets (e.g. [03-12-07-042]), "
+    "then provide a brief explanation. "
+    "Semantic IDs are numeric hierarchical cluster codes in the format [C1-C2-C3-ITEM_IDX] "
+    "(e.g. [03-12-07-042], [01-08-03-015]). Do NOT use country/grape abbreviations."
     "<|eot_id|><|start_header_id|>user<|end_header_id|>\n"
     "{instruction}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n"
 )
 
 # ── ID parser ─────────────────────────────────────────────────────────────────
-ID_PAT = r'[A-Z][A-Z0-9]{1,4}-[A-Z][A-Z0-9]{1,4}-[A-Z][A-Z0-9]{1,4}-(?:\d{4}|NV)'
+# Numeric Semantic ID pattern: C1(00-15)-C2(00-15)-C3(00-15)-ITEM_IDX(000-NNN)
+# Real IDs from build_semantic_ids.py, e.g. '03-12-07-042'
+ID_PAT = r'\b\d{2}-\d{2}-\d{2}-\d{3,4}\b'
 
 def parse_semantic_id(text: str) -> str:
     """
