@@ -9,7 +9,7 @@
 
 ## 📌 Tóm tắt
 
-Hệ thống gợi ý rượu vang kết hợp **Generative Retrieval** (TIGER framework với Llama-3-8B LoRA) và **Collaborative Filtering** trên hai tập dữ liệu:
+Hệ thống gợi ý rượu vang kết hợp **Generative Retrieval** (TIGER-style Semantic-ID Generative Retrieval với Llama-3-8B LoRA) và **Collaborative Filtering** trên hai tập dữ liệu:
 - **Winemag-130K**: 129,915 chai rượu vang quốc tế → đánh giá Cold-Start
 - **Sapo (Việt Nam)**: 305 sản phẩm, 400+ khách hàng → đánh giá Warm-Start
 
@@ -23,7 +23,7 @@ Hệ thống gợi ý rượu vang kết hợp **Generative Retrieval** (TIGER f
 | Struct-Filter BM25 | 7.39% | 14.84% | 11.31% | 10.15% | 1.4ms |
 | GNN-Filter | 0.21% | 1.71% | 0.80% | 0.53% | 1.1ms |
 | TIGER Greedy | 0.15% | 0.15% | 0.15% | 0.15% | 2,278ms |
-| Model 1 — TIGER + Price Rerank | 2.42% | 7.76% | 4.87% | 3.97% | 15,703ms |
+| Model 1 — TIGER-style + Price Rerank | 2.42% | 7.76% | 4.87% | 3.97% | 15,703ms |
 | **Model 2 — Parser-Filter-Sommelier** | **10.03%** | **39.42%** | **22.86%** | **17.79%** | **86.6ms** |
 
 ### 🔥 Noisy Realistic Mixed Benchmark (N=12,991 — truy vấn nhiễu thực tế)
@@ -38,7 +38,7 @@ Hệ thống gợi ý rượu vang kết hợp **Generative Retrieval** (TIGER f
 | Struct-Filter BM25 | 0.18% | 0.79% | 0.44% | 0.34% |
 | TIGER Greedy | 8.51% | 8.51% | 8.51% | 8.51% |
 | Model 2 — Parser-Filter-Sommelier | 4.98% | 20.87% | 11.83% | 9.08% |
-| **Model 1 — TIGER + Price Rerank** | **33.49%** | **75.84%** | **54.42%** | **47.56%** |
+| **Model 1 — TIGER-style + Price Rerank** | **33.49%** | **75.84%** | **54.42%** | **47.56%** |
 
 > 📁 Kết quả đầy đủ: [`results/noisy_query_12k_all_models_results.csv`](results/noisy_query_12k_all_models_results.csv)  
 > 📄 Báo cáo chi tiết: [`results/noisy_realistic_evaluation_report.docx`](results/noisy_realistic_evaluation_report.docx)  
@@ -137,7 +137,7 @@ Mở trình duyệt: **http://localhost:5005**
 ### Các tính năng Demo:
 | Tab | Mô tả |
 |-----|-------|
-| 🔍 Tìm kiếm | BM25 / TF-IDF / Winemag 130K / TIGER Llama-3 (simulated) |
+| 🔍 Tìm kiếm | BM25 / TF-IDF / Winemag 130K / TIGER-style Llama-3 (simulated) |
 | ⚖️ So sánh | 5 phương pháp song song: M1-M5 |
 | 👤 Gợi ý Cá nhân | CF trên dữ liệu Sapo thực (khách hàng đã ẩn danh) |
 | 💡 Giải thích | Tại sao hệ thống recommend sản phẩm đó |
@@ -187,7 +187,7 @@ Mở trình duyệt: **http://localhost:5005**
   --n 500
 ```
 
-### 5. Đánh giá TIGER (Constrained Beam Search)
+### 5. Đánh giá mô hình Generative Retrieval dạng TIGER (TIGER-style)
 
 ```bash
 # Cần model đã fine-tune

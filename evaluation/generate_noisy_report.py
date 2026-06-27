@@ -5,7 +5,7 @@ generate_noisy_report.py
 Tạo lại file noisy_realistic_evaluation_report.docx với số liệu thực tế
 từ noisy_query_12k_all_models_results.csv (N=12,991 mẫu).
 
-Model 1 (TIGER + Price Rerank) đạt Recall@10 = 75.84% — chiến thắng nhờ
+Model 1 (TIGER-style + Price Rerank) đạt Recall@10 = 75.84% — chiến thắng nhờ
 hiểu ngữ nghĩa, vượt trội so với Model 2 (20.87%) và BM25 (0.79%).
 """
 
@@ -30,8 +30,8 @@ RESULTS = [
     {"method": "BM25+ Enhanced",         "r1": 0.18,  "r5": 0.53,   "r10": 0.81,  "ndcg10": 0.45,  "mrr": 0.34, "highlight": False},
     {"method": "Struct-Filter BM25",     "r1": 0.18,  "r5": 0.55,   "r10": 0.79,  "ndcg10": 0.44,  "mrr": 0.34, "highlight": False},
     {"method": "GNN-Filter",             "r1": 0.04,  "r5": 0.14,   "r10": 0.28,  "ndcg10": 0.13,  "mrr": 0.09, "highlight": False},
-    {"method": "TIGER Greedy",           "r1": 8.51,  "r5": 8.51,   "r10": 8.51,  "ndcg10": 8.51,  "mrr": 8.51, "highlight": False},
-    {"method": "Proposed Hybrid (Model 1) [TIGER + Price Rerank]",
+    {"method": "TIGER-style Greedy",           "r1": 8.51,  "r5": 8.51,   "r10": 8.51,  "ndcg10": 8.51,  "mrr": 8.51, "highlight": False},
+    {"method": "Proposed Hybrid (Model 1) [TIGER-style + Price Rerank]",
                                           "r1": 33.49, "r5": 67.42,  "r10": 75.84, "ndcg10": 54.42, "mrr": 47.56, "highlight": True},
     {"method": "Proposed Model 2 (Ours) [Parser-Filter-Sommelier]",
                                           "r1": 4.98,  "r5": 14.25,  "r10": 20.87, "ndcg10": 11.83, "mrr": 9.08, "highlight": False},
@@ -44,7 +44,7 @@ PART_A = [  # 50% Noised original (6,495 samples)
     {"method": "BM25+ Enhanced",         "r1": 0.00, "r10": 0.05,  "ndcg10": 0.02, "mrr": 0.01},
     {"method": "Struct-Filter BM25",     "r1": 0.00, "r10": 0.05,  "ndcg10": 0.02, "mrr": 0.01},
     {"method": "GNN-Filter",             "r1": 0.00, "r10": 0.05,  "ndcg10": 0.02, "mrr": 0.01},
-    {"method": "TIGER Greedy",           "r1": 0.03, "r10": 0.03,  "ndcg10": 0.03, "mrr": 0.03},
+    {"method": "TIGER-style Greedy",           "r1": 0.03, "r10": 0.03,  "ndcg10": 0.03, "mrr": 0.03},
     {"method": "Proposed Hybrid (Model 1)", "r1": 0.72, "r10": 2.20, "ndcg10": 1.40, "mrr": 1.15},
     {"method": "Proposed Model 2 (Ours)","r1": 3.02, "r10": 12.12, "ndcg10": 6.89, "mrr": 5.31},
 ]
@@ -55,7 +55,7 @@ PART_B = [  # 50% Realistic short (6,496 samples)
     {"method": "BM25+ Enhanced",         "r1": 0.06, "r10": 0.35,  "ndcg10": 0.18, "mrr": 0.12},
     {"method": "Struct-Filter BM25",     "r1": 0.09, "r10": 0.40,  "ndcg10": 0.21, "mrr": 0.16},
     {"method": "GNN-Filter",             "r1": 0.02, "r10": 0.22,  "ndcg10": 0.09, "mrr": 0.05},
-    {"method": "TIGER Greedy",           "r1": 0.12, "r10": 0.12,  "ndcg10": 0.12, "mrr": 0.12},
+    {"method": "TIGER-style Greedy",           "r1": 0.12, "r10": 0.12,  "ndcg10": 0.12, "mrr": 0.12},
     {"method": "Proposed Hybrid (Model 1)", "r1": 1.97, "r10": 5.73, "ndcg10": 3.71, "mrr": 3.08},
     {"method": "Proposed Model 2 (Ours)","r1": 3.97, "r10": 16.87, "ndcg10": 9.58, "mrr": 7.36},
 ]
@@ -210,14 +210,9 @@ def generate():
     # ── 2. THIẾT LẬP MÔ HÌNH ───────────────────────────────────────────────
     heading(doc, "2. Thiết lập mô hình (Model Configurations)", 1)
 
-    heading(doc, "2.1 Mô hình đề xuất 1 — Proposed Hybrid (TIGER + Price Rerank)", 2)
+    heading(doc, "2.1 Mô hình đề xuất 1 — Proposed Hybrid (TIGER-style + Price Rerank)", 2)
     para(doc, (
-        "Mô hình 1 khai thác sức mạnh hiểu ngữ nghĩa mềm dẻo của LLM Llama-3-8B được tinh chỉnh LoRA "
-        "để ánh xạ trực tiếp truy vấn nhiễu sang mã cụm ngữ nghĩa phân cấp 3 tầng (C1-C2-C3) trong "
-        "không gian 4.096 cụm hương vị. Khi LLM sinh ra mã cụm không hợp lệ, hệ thống kích hoạt "
-        "cơ chế dự phòng Style-Aware Cluster Selection: lọc theo phong cách rượu (red/white/...) + "
-        "quốc gia, sau đó chọn cụm có giá centroid gần nhất với ngân sách yêu cầu. "
-        "Trong cụm đã chọn (~170 chai), bộ Price Reranker xếp hạng theo khoảng cách giá tuyệt đối."
+        "Mô hình 1 áp dụng phương pháp gợi ý lai dựa trên cơ chế Truy xuất Tạo sinh lấy cảm hứng từ TIGER (TIGER-inspired Semantic-ID Generative Retrieval). Để thích ứng với điều kiện phần cứng và bài toán khởi động lạnh (Cold-Start), thay vì dùng bộ RQ-VAE của TIGER gốc, hệ thống xây dựng cây mã định danh phân cấp 3 tầng (16x16x16 = 4.096 cụm hương vị) thông qua pipeline kết hợp TF-IDF, Truncated SVD (128 chiều) và thuật toán phân cụm Hierarchical K-Means. Llama-3-8B tinh chỉnh LoRA được huấn luyện để sinh ra mã cụm Semantic ID (C1-C2-C3-ITEM_IDX). Khi sinh mã cụm không hợp lệ, cơ chế dự phòng Style-Aware Cluster Selection sẽ tự động lọc theo phong cách rượu + quốc gia và chọn cụm có giá centroid gần nhất với ngân sách. Cuối cùng, bộ Price Reranker thực hiện xếp hạng lại trong không gian ứng viên thu hẹp (~170 chai rượu)."
     ))
 
     heading(doc, "2.2 Mô hình đề xuất 2 — Proposed Model 2 (Parser-Filter-Sommelier)", 2)
@@ -310,7 +305,7 @@ def generate():
     heading(doc, "5.1 Kết quả từ noisy_query_12k_all_models_results.csv (Simulation-based)", 2)
     para(doc, (
         "Khi chạy đánh giá mô phỏng ngữ nghĩa đầy đủ (dựa trên khả năng thực sự của LLM đã tinh chỉnh), "
-        "Mô hình 1 (TIGER + Price Rerank) đạt hiệu năng vượt trội rõ rệt:\n"
+        "Mô hình 1 (TIGER-style + Price Rerank) đạt hiệu năng vượt trội rõ rệt:\n"
         "• Recall@1 = 33,49% (vs Model 2: 4,98% — gấp 6,7 lần)\n"
         "• Recall@5 = 67,42% (vs Model 2: 14,25% — gấp 4,7 lần)\n"
         "• Recall@10 = 75,84% (vs Model 2: 20,87% — gấp 3,6 lần)\n"
@@ -320,7 +315,7 @@ def generate():
 
     heading(doc, "5.2 Lý giải tại sao Mô hình 1 thắng trên dữ liệu nhiễu", 2)
     para(doc, (
-        "Mô hình 1 (TIGER + Price Rerank) thắng vượt trội trên tập nhiễu vì:"
+        "Mô hình 1 (TIGER-style + Price Rerank) thắng vượt trội trên tập nhiễu vì:"
     ))
     points = [
         ("1. Hiểu ngữ nghĩa mềm:",
@@ -364,7 +359,7 @@ def generate():
     # ── 6. BẢNG TÓM TẮT SO SÁNH ────────────────────────────────────────────
     heading(doc, "6. Bảng tóm tắt so sánh hai mô hình đề xuất", 1)
 
-    compare_headers = ["Tiêu chí", "Model 1 (TIGER + Price Rerank)", "Model 2 (Parser-Filter-Sommelier)"]
+    compare_headers = ["Tiêu chí", "Model 1 (TIGER-style + Price Rerank)", "Model 2 (Parser-Filter-Sommelier)"]
     compare_data = [
         ["Recall@10 (Tập Test Chuẩn)", "7,76%", "39,42% ✓ TỐT HƠN"],
         ["Recall@10 (Nhiễu Thực Tế)", "75,84% ✓ TỐT HƠN", "20,87%"],
@@ -404,7 +399,7 @@ def generate():
         "Recall@10 = 39,42% trên tập test chuẩn — vượt trội tất cả baseline."
     ))
     para(doc, (
-        "2. Mô hình 1 (TIGER + Price Rerank) là lựa chọn tối ưu khi người dùng nhập truy vấn "
+        "2. Mô hình 1 (TIGER-style + Price Rerank) là lựa chọn tối ưu khi người dùng nhập truy vấn "
         "mơ hồ, thiếu từ khóa cụ thể, hoặc viết sai chính tả nặng. Recall@10 = 75,84% trên tập nhiễu "
         "thực tế — gấp 3,6 lần Mô hình 2 và gấp 96 lần BM25 trong cùng điều kiện."
     ))
