@@ -4,256 +4,275 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TIGER Wine AI — Thesis Defense Demo | Ton Duc Thang 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f5f7fa;
-  --bg2: #ffffff;
-  --bg3: #eef2f7;
-  --card: #ffffff;
-  --border: #dcdfe6;
-  --red: #c0392b;
-  --red-l: #e74c3c;
-  --gold: #d4ac0d;
-  --gold-l: #f1c40f;
-  --blue: #2c3e50;
-  --blue-l: #3498db;
-  --green: #27ae60;
+  --bg: #0f0a0d; /* Deep Royal Burgundy shadow background */
+  --bg-gradient: linear-gradient(180deg, #0d070a 0%, #15090e 100%);
+  --bg2: #190f13; /* Premium Burgundy Card Base */
+  --bg3: #221419; /* Slightly lighter card base for hover state */
+  --card: #191014;
+  --border: rgba(223, 186, 115, 0.12); /* Champagne gold border */
+  --border-hover: rgba(223, 186, 115, 0.28);
+  --border-focus: #dfba73;
+  --red: #8c1d31; /* Burgundy primary color */
+  --red-l: #b52c42; /* Burgundy Accent */
+  --gold: #dfba73; /* Elegant Gold */
+  --gold-l: #f5d496;
+  --blue: #1c354d;
+  --blue-l: #2e86c1;
+  --green: #1d6f42;
   --green-l: #2ecc71;
-  --text: #2c3e50;
-  --muted: #7f8c8d;
-  --r: 8px;
+  --text: #f9f7f5; /* Off-white ivory */
+  --muted: #a69195; /* Muted plum-grey */
+  --r: 12px;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+html { scroll-behavior: smooth; background-color: var(--bg); }
+body { font-family: var(--font-sans); background: var(--bg-gradient); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
 /* NAV */
 nav {
   position: fixed; top:0; left:0; right:0; z-index:200;
-  height: 60px; display:flex; align-items:center; padding: 0 32px;
-  gap: 24px;
-  background: var(--bg2);
+  height: 68px; display:flex; align-items:center; padding: 0 40px;
+  gap: 20px;
+  background: rgba(25, 16, 20, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
-.nav-logo { font-weight:900; font-size:1.1rem; display:flex; align-items:center; gap:8px; margin-right:auto; }
-.nav-logo span { color: var(--red-l); }
+.nav-logo { font-family: var(--font-serif); font-weight: 800; font-size:1.35rem; display:flex; align-items:center; gap:10px; margin-right:auto; letter-spacing: -0.01em; }
+.nav-logo span { color: var(--gold); }
 .nav-tab {
-  padding: 7px 18px; border-radius:6px; font-size:0.82rem; font-weight:600;
-  color:var(--muted); cursor:pointer; border:none; background:transparent;
-  font-family:inherit; transition:all 0.2s;
+  padding: 8px 18px; border-radius:30px; font-size:0.85rem; font-weight:600;
+  color:var(--muted); cursor:pointer; border:1px solid transparent; background:transparent;
+  font-family:inherit; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.nav-tab.active, .nav-tab:hover { background:var(--bg3); color:var(--text); }
-.nav-tab.active { color:var(--blue-l); }
+.nav-tab:hover { color:var(--text); background: rgba(223, 186, 115, 0.04); border-color: rgba(223, 186, 115, 0.08); }
+.nav-tab.active { background: rgba(140, 29, 49, 0.15); border-color: rgba(140, 29, 49, 0.35); color: var(--gold); }
 
 /* MAIN */
-main { padding-top:60px; min-height:100vh; }
+main { padding-top:100px; padding-bottom: 60px; min-height:100vh; }
 
 /* PANELS */
-.panel { display:none; padding:32px; max-width:1280px; margin:0 auto; }
-.panel.active { display:block; animation: fadeIn 0.2s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+.panel { display:none; padding: 0 40px; max-width:1400px; margin:0 auto; }
+.panel.active { display:block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
 /* PAGE HEADER */
-.page-head { margin-bottom:28px; }
-.page-eyebrow { font-size:0.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--red-l); margin-bottom:8px; }
-.page-title { font-size:1.8rem; font-weight:900; margin-bottom:6px; }
-.page-desc { font-size:0.88rem; color:var(--muted); line-height:1.6; max-width:700px; }
+.page-head { margin-bottom:32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+.page-eyebrow { font-size:0.75rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; opacity: 0.9; }
+.page-title { font-family: var(--font-serif); font-size:2.4rem; font-weight:800; margin-bottom:10px; letter-spacing: -0.02em; color: #ffffff; }
+.page-desc { font-size:0.95rem; color:var(--muted); line-height:1.7; max-width:800px; }
 
 /* CARDS */
-.card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
-.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:30px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); transition: border-color 0.3s; }
+.card:hover { border-color: var(--border-hover); }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; }
+.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
 
 /* STAT CARDS */
 .stat-card {
-  background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:20px;
-  border-top:3px solid; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:24px;
+  border-top:4px solid; box-shadow: 0 8px 32px rgba(0,0,0,0.25); transition: all 0.3s;
 }
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
 .stat-card.r { border-top-color:var(--red-l); }
 .stat-card.g { border-top-color:var(--green-l); }
 .stat-card.b { border-top-color:var(--blue-l); }
-.stat-card.y { border-top-color:var(--gold-l); }
-.stat-lbl { font-size:0.75rem; color:var(--muted); margin-bottom:6px; }
-.stat-val { font-size:2rem; font-weight:900; line-height:1; }
-.stat-card.r .stat-val { color:var(--red-l); }
+.stat-card.y { border-top-color:var(--gold); }
+.stat-lbl { font-size:0.8rem; color:var(--muted); margin-bottom:8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-val { font-size:2.2rem; font-weight:800; line-height:1; font-family: var(--font-serif); }
+.stat-card.r .stat-val { color:var(--text); }
 .stat-card.g .stat-val { color:var(--green-l); }
 .stat-card.b .stat-val { color:var(--blue-l); }
-.stat-card.y .stat-val { color:var(--gold-l); }
-.stat-sub { font-size:0.72rem; color:var(--muted); margin-top:4px; }
+.stat-card.y .stat-val { color:var(--gold); }
+.stat-sub { font-size:0.78rem; color:var(--muted); margin-top:8px; }
 
 /* INPUTS */
-.input-row { display:flex; gap:10px; }
+.input-row { display:flex; gap:12px; }
 input[type=text], select, textarea {
-  flex:1; padding:10px 14px; border-radius:var(--r);
-  background:#ffffff; border:1px solid var(--border);
-  color:var(--text); font-size:0.88rem; font-family:inherit; outline:none;
-  transition:border-color .2s;
+  flex:1; padding:14px 20px; border-radius:8px;
+  background: rgba(25, 16, 20, 0.6); border: 1px solid var(--border);
+  color:var(--text); font-size:0.95rem; font-family:inherit; outline:none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-input:focus, select:focus, textarea:focus { border-color:var(--blue-l); }
+input:focus, select:focus, textarea:focus { border-color:var(--border-focus); background: var(--bg3); box-shadow: 0 0 0 1px var(--border-focus); }
 select { cursor:pointer; }
 .btn {
-  padding:10px 18px; border-radius:var(--r); font-weight:600; font-size:0.85rem;
-  border:1px solid var(--border); cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
+  padding:14px 24px; border-radius:8px; font-weight:700; font-size:0.9rem;
+  border:1px solid var(--border); cursor:pointer; font-family:inherit; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); white-space:nowrap;
 }
-.btn-red { background:var(--red); color:#fff; border-color: var(--red); }
-.btn-red:hover { background:var(--red-l); border-color: var(--red-l); }
-.btn-ghost { background:var(--bg2); border:1px solid var(--border); color:var(--text); }
-.btn-ghost:hover { background:var(--bg3); }
+.btn-red { background:var(--red); color:#fff; border-color: var(--red); box-shadow: 0 4px 14px rgba(140, 29, 49, 0.3); }
+.btn-red:hover { background:var(--red-l); border-color: var(--red-l); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(140, 29, 49, 0.45); }
+.btn-ghost { background:transparent; border:1px solid var(--border); color:var(--gold); }
+.btn-ghost:hover { background:rgba(223, 186, 115, 0.05); border-color: var(--gold); }
 .btn:disabled { opacity:.4; cursor:not-allowed; transform:none !important; }
 
 /* METHOD PILLS */
-.method-group { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.method-group { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
 .method-pill {
-  padding:6px 16px; border-radius:100px; font-size:0.78rem; font-weight:600;
-  border:1px solid var(--border); background:var(--bg2); color:var(--muted);
-  cursor:pointer; transition:all .2s;
+  padding:8px 20px; border-radius:100px; font-size:0.85rem; font-weight:600;
+  border:1px solid var(--border); background:rgba(25, 16, 20, 0.4); color:var(--muted);
+  cursor:pointer; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.method-pill.active { background:rgba(52, 152, 219, 0.1); border-color:var(--blue-l); color:var(--text); }
+.method-pill:hover { color:var(--text); border-color: var(--border-hover); }
+.method-pill.active { background:rgba(223, 186, 115, 0.08); border-color:var(--gold); color:var(--gold); font-weight: 700; }
 
 /* RESULTS LIST */
-.result-list { display:flex; flex-direction:column; gap:10px; }
+.result-list { display:flex; flex-direction:column; gap:14px; }
 .result-item {
-  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
-  padding:16px 20px; display:flex; align-items:flex-start; gap:16px;
-  transition:all .2s; cursor:pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+  padding:20px 24px; display:flex; align-items:flex-start; gap:20px;
+  transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
-.result-item:hover { border-color:var(--blue-l); transform:translateX(2px); }
-.result-item.top { border-left:3px solid var(--gold); }
+.result-item:hover { border-color:var(--gold); transform:translateX(4px); background: var(--bg3); }
+.result-item.top { border-left:4px solid var(--gold); }
 .result-rank {
-  min-width:32px; height:32px; border-radius:50%; display:flex;
-  align-items:center; justify-content:center; font-size:0.78rem; font-weight:800;
-  background:var(--bg3); border:1px solid var(--border); flex-shrink:0;
+  min-width:36px; height:36px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; font-size:0.85rem; font-weight:800;
+  background:var(--bg3); border:1px solid var(--border); flex-shrink:0; color: var(--gold);
 }
-.result-item.top .result-rank { background:var(--gold); color:#fff; border:none; }
+.result-item.top .result-rank { background:var(--gold); color:#191014; border:none; }
 .result-body { flex:1; min-width:0; }
-.result-name { font-weight:700; font-size:0.9rem; margin-bottom:4px; }
-.result-type { font-size:0.75rem; color:var(--muted); margin-bottom:6px; }
+.result-name { font-family: var(--font-sans); font-weight:700; font-size:1.05rem; margin-bottom:6px; color: #ffffff; }
+.result-type { font-size:0.82rem; color:var(--muted); margin-bottom:8px; }
 .result-reason {
-  font-size:0.72rem; color:var(--blue-l); background:rgba(52,152,219,.06);
-  border:1px solid rgba(52,152,219,.15); border-radius:4px;
-  padding:5px 10px; display:inline-block;
+  font-size:0.8rem; color:var(--gold); background:rgba(223,186,115,.04);
+  border:1px solid rgba(223,186,115,.15); border-radius:6px;
+  padding:6px 12px; display:inline-block; line-height: 1.5;
 }
 .result-right { text-align:right; flex-shrink:0; }
-.result-price { font-size:0.95rem; font-weight:800; color:var(--gold); }
-.result-score { font-size:0.7rem; color:var(--muted); margin-top:3px; }
+.result-price { font-size:1.1rem; font-weight:800; color:var(--gold); font-family: var(--font-serif); }
+.result-score { font-size:0.78rem; color:var(--muted); margin-top:6px; font-family: monospace; }
 
 /* COMPARE COLUMNS */
 .compare-col { flex:1; }
 .compare-header {
-  display:flex; align-items:center; gap:8px; padding:14px 20px;
-  border-radius:6px 6px 0 0; border:1px solid var(--border);
-  font-weight:700; font-size:0.88rem;
+  display:flex; align-items:center; gap:10px; padding:18px 24px;
+  border-radius:10px 10px 0 0; border:1px solid var(--border);
+  font-weight:700; font-size:0.95rem; font-family: var(--font-serif);
 }
-.compare-col.bm25 .compare-header { background:rgba(52,152,219,.08); border-bottom:2px solid var(--blue-l); }
-.compare-col.tfidf .compare-header { background:rgba(231,76,60,.08); border-bottom:2px solid var(--red-l); }
-.compare-body { border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px; overflow:hidden; }
-.compare-item { padding:12px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.compare-col.bm25 .compare-header { background:rgba(46,134,193,.06); border-bottom:2px solid var(--blue-l); color: var(--text); }
+.compare-col.tfidf .compare-header { background:rgba(181,44,66,.06); border-bottom:2px solid var(--red-l); color: var(--text); }
+.compare-body { background: var(--card); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; overflow:hidden; }
+.compare-item { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; transition: background 0.3s; cursor: pointer; }
+.compare-item:hover { background: var(--bg3); }
 .compare-item:last-child { border-bottom:none; }
-.compare-rank { width:22px; font-size:0.72rem; color:var(--muted); font-weight:700; flex-shrink:0; }
-.compare-name { flex:1; font-size:0.82rem; }
-.compare-price { font-size:0.78rem; font-weight:700; color:var(--gold); }
-.compare-score { font-size:0.68rem; color:var(--muted); }
-.match-badge { font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:700; }
-.match-y { background:rgba(46,204,113,.1); color:var(--green); border:1px solid rgba(46,204,113,.2); }
-.match-n { background:rgba(0,0,0,.04); color:var(--muted); }
+.compare-rank { width:24px; font-size:0.8rem; color:var(--gold); font-weight:800; flex-shrink:0; }
+.compare-name { flex:1; font-size:0.88rem; color: #ffffff; font-weight: 500; }
+.compare-price { font-size:0.88rem; font-weight:700; color:var(--gold); font-family: var(--font-serif); }
+.compare-score { font-size:0.75rem; color:var(--muted); margin-top: 2px; font-family: monospace; }
+.match-badge { font-size:0.7rem; padding:3px 8px; border-radius:4px; font-weight:700; text-transform: uppercase; letter-spacing: 0.05em; }
+.match-y { background:rgba(46,204,113,.1); color:var(--green-l); border:1px solid rgba(46,204,113,.2); }
+.match-n { background:rgba(255,255,255,.03); color:var(--muted); }
 
 /* CF PANEL */
-.user-list { display:flex; flex-direction:column; gap:6px; max-height:400px; overflow-y:auto; }
+.user-list { display:flex; flex-direction:column; gap:8px; max-height:450px; overflow-y:auto; padding-right: 4px; }
 .user-item {
-  padding:12px 16px; border-radius:var(--r); background:var(--bg2);
-  border:1px solid var(--border); cursor:pointer; transition:all .2s;
+  padding:16px 20px; border-radius:var(--r); background: rgba(25, 16, 20, 0.4);
+  border:1px solid var(--border); cursor:pointer; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display:flex; justify-content:space-between; align-items:center;
 }
-.user-item:hover, .user-item.selected { border-color:var(--red-l); background:rgba(231,76,60,.03); }
-.user-name { font-weight:600; font-size:0.88rem; }
-.user-meta { font-size:0.72rem; color:var(--muted); }
+.user-item:hover, .user-item.selected { border-color:var(--gold); background:rgba(223, 186, 115, 0.04); }
+.user-item.selected { box-shadow: inset 0 0 0 1px var(--gold); }
+.user-name { font-weight:700; font-size:0.95rem; color: #ffffff; }
+.user-meta { font-size:0.78rem; color:var(--muted); margin-top: 4px; }
 .history-item {
-  display:flex; align-items:center; gap:12px; padding:10px 14px;
-  border-radius:6px; background:var(--bg2); border:1px solid var(--border);
-  margin-bottom:6px;
+  display:flex; align-items:center; gap:14px; padding:14px 18px;
+  border-radius:8px; background: rgba(25, 16, 20, 0.3); border:1px solid var(--border);
+  margin-bottom:8px; transition: border-color 0.3s;
 }
-.history-qty { font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(231,76,60,.08); color:var(--red); }
-.neighbor-tag { display:inline-block; padding:4px 10px; border-radius:4px; background:rgba(52,152,219,.05); border:1px solid rgba(52,152,219,.15); font-size:0.72rem; color:var(--blue); margin:3px; }
+.history-item:hover { border-color: var(--border-hover); }
+.history-qty { font-size:0.75rem; font-weight:800; padding:3px 10px; border-radius:4px; background:rgba(140, 29, 49, 0.15); color:var(--gold); }
+.neighbor-tag { display:inline-block; padding:6px 14px; border-radius:20px; background:rgba(223,186,115,.04); border:1px solid rgba(223,186,115,.12); font-size:0.78rem; color:var(--gold); margin:4px; font-weight: 500; }
 
 /* MODAL */
-.modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.4); backdrop-filter:blur(2px); align-items:center; justify-content:center; }
+.modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(7,3,5,.6); backdrop-filter:blur(8px); align-items:center; justify-content:center; }
 .modal-overlay.open { display:flex; }
-.modal { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:28px; max-width:600px; width:90%; max-height:80vh; overflow-y:auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-.modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
-.modal-close { background:none; border:none; color:var(--muted); font-size:1.3rem; cursor:pointer; }
-.modal-title { font-weight:800; font-size:1.1rem; margin-bottom:6px; }
-.modal-type { font-size:0.75rem; }
+.modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:36px; max-width:650px; width:90%; max-height:85vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+.modal-close { background:none; border:none; color:var(--muted); font-size:1.6rem; cursor:pointer; transition: color 0.3s; }
+.modal-close:hover { color: var(--gold); }
+.modal-title { font-family: var(--font-serif); font-weight:800; font-size:1.4rem; margin-bottom:8px; color: #ffffff; }
+.modal-type { font-size:0.8rem; display: flex; gap: 8px; }
+.modal-desc { font-family: var(--font-sans); }
 
 /* TABLE */
-.data-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
-.data-table th { background:rgba(52,152,219,.08); color:var(--blue); padding:10px 14px; text-align:left; font-size:0.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; border-bottom:1px solid var(--border); }
-.data-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
-.data-table tr.best td { background:rgba(231,76,60,.04); font-weight:700; }
-.data-table tr:hover td { background:rgba(0,0,0,.01); }
+.data-table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+.data-table th { background:rgba(223,186,115,.04); color:var(--gold); padding:12px 16px; text-align:left; font-size:0.8rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid var(--border); }
+.data-table td { padding:12px 16px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.data-table tr.best td { background:rgba(140,29,49,.08); font-weight:700; border-left: 3px solid var(--red-l); }
+.data-table tr:hover td { background:rgba(255,255,255,.01); }
 
 /* PIPELINE VIZ */
-.pipe-viz { display:flex; align-items:center; gap:0; background:transparent; border:1px solid var(--border); border-radius:var(--r); padding:14px 12px; overflow-x:auto; margin:16px 0; }
-.pipe-box { flex-shrink:0; background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:10px 12px; text-align:center; min-width:120px; transition:all .3s; }
-.pipe-box.active { background:rgba(52,152,219,.08); border-color:var(--blue-l); color:var(--blue); }
-.pipe-box.done { background:rgba(46,204,113,.06); border-color:var(--green-l); color:var(--green); }
+.pipe-viz { display:flex; align-items:center; gap:0; background:rgba(25, 16, 20, 0.4); border:1px solid var(--border); border-radius:var(--r); padding:18px 16px; overflow-x:auto; margin:24px 0; }
+.pipe-box { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 16px; text-align:center; min-width:130px; transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.pipe-box.active { background:rgba(223,186,115,.08); border-color:var(--gold); color:var(--gold); box-shadow: 0 0 15px rgba(223,186,115,0.2); }
+.pipe-box.done { background:rgba(46,204,113,.04); border-color:var(--green-l); color:var(--green-l); }
 .pipe-icon { display:none; }
-.pipe-name { font-size:0.78rem; font-weight:700; }
-.pipe-detail { font-size:0.65rem; color:var(--muted); margin-top:2px; }
-.pipe-arr { padding:0 8px; color:var(--muted); font-size:1.1rem; flex-shrink:0; }
+.pipe-name { font-size:0.85rem; font-weight:700; }
+.pipe-detail { font-size:0.7rem; color:var(--muted); margin-top:4px; }
+.pipe-arr { padding:0 12px; color:var(--muted); font-size:1.3rem; flex-shrink:0; }
 
 /* LOADING */
-.loading-dots { display:inline-flex; gap:4px; align-items:center; }
-.loading-dots span { width:6px; height:6px; border-radius:50%; background:var(--red-l); animation: blink 1.2s infinite; }
+.loading-dots { display:inline-flex; gap:5px; align-items:center; }
+.loading-dots span { width:7px; height:7px; border-radius:50%; background:var(--gold); animation: blink 1.2s infinite; }
 .loading-dots span:nth-child(2) { animation-delay:.2s; }
 .loading-dots span:nth-child(3) { animation-delay:.4s; }
 @keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
 
 /* TAGS */
-.tag { display:inline-block; padding:3px 10px; border-radius:4px; font-size:0.7rem; font-weight:700; }
-.tag-red { background:rgba(231,76,60,.08); color:var(--red); border:1px solid rgba(231,76,60,.15); }
-.tag-blue { background:rgba(52,152,219,.08); color:var(--blue); border:1px solid rgba(52,152,219,.15); }
-.tag-gold { background:rgba(241,196,15,.1); color:var(--gold); border:1px solid rgba(241,196,15,.2); }
-.tag-green { background:rgba(46,204,113,.08); color:var(--green); border:1px solid rgba(46,204,113,.15); }
+.tag { display:inline-block; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform: uppercase; letter-spacing: 0.03em; }
+.tag-red { background:rgba(140,29,49,.15); color:var(--gold); border:1px solid rgba(140,29,49,.3); }
+.tag-blue { background:rgba(46,134,193,.1); color:var(--text); border:1px solid rgba(46,134,193,.2); }
+.tag-gold { background:rgba(223,186,115,.08); color:var(--gold); border:1px solid rgba(223,186,115,.2); }
+.tag-green { background:rgba(46,204,113,.1); color:var(--green-l); border:1px solid rgba(46,204,113,.2); }
 
 /* STATUS BAR */
-.status-bar { display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:var(--r); background:var(--bg2); border:1px solid var(--border); font-size:0.78rem; margin-bottom:16px; }
-.status-dot { width:8px; height:8px; border-radius:50%; }
-.dot-green { background:var(--green); }
+.status-bar { display:flex; align-items:center; gap:12px; padding:12px 20px; border-radius:var(--r); background:var(--card); border:1px solid var(--border); font-size:0.85rem; margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.status-dot { width:10px; height:10px; border-radius:50%; }
+.dot-green { background:var(--green-l); box-shadow: 0 0 10px var(--green-l); }
 
-.divider { height:1px; background:var(--border); margin:28px 0; }
-.section-title { font-weight:800; font-size:1rem; margin-bottom:14px; }
-.empty-state { text-align:center; padding:48px; color:var(--muted); font-size:0.88rem; }
-.explain-step { display:flex; align-items:flex-start; gap:14px; padding:14px; border-radius:var(--r); background:var(--bg2); border:1px solid var(--border); margin-bottom:8px; }
-.explain-step-icon { font-size:1.2rem; flex-shrink:0; }
-.explain-step-title { font-weight:700; font-size:0.85rem; margin-bottom:4px; }
-.explain-step-detail { font-size:0.78rem; color:var(--muted); }
-.fail-bar-row { margin-bottom:12px; }
-.fail-bar-label { font-size:0.78rem; font-weight:600; margin-bottom:4px; display:flex; justify-content:space-between; }
-.fail-bar { height:10px; border-radius:5px; transition:width .8s ease; }
-.neighbor-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:var(--r); background:var(--bg2); border:1px solid var(--border); margin-bottom:6px; font-size:0.8rem; }
-.case-card { padding:16px; border-radius:var(--r); border:1px solid var(--border); margin-bottom:10px; background:var(--bg2); }
-.case-card.fail { border-left:3px solid var(--red-l); background:rgba(231,76,60,.02); }
-.case-card.success { border-left:3px solid var(--green-l); background:rgba(46,204,113,.02); }
-.case-type { font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:8px; }
-.case-type.fail { background:rgba(231,76,60,.08); color:var(--red); }
-.case-type.success { background:rgba(46,204,113,.08); color:var(--green); }
-.sota-best td { background:rgba(231,76,60,.02); font-weight:700; border-left:3px solid var(--red-l); }
+.divider { height:1px; background:var(--border); margin:32px 0; }
+.section-title { font-family: var(--font-serif); font-weight:800; font-size:1.2rem; margin-bottom:18px; color: #ffffff; }
+.empty-state { text-align:center; padding:54px; color:var(--muted); font-size:0.95rem; }
+.explain-step { display:flex; align-items:flex-start; gap:18px; padding:18px; border-radius:var(--r); background:var(--card); border:1px solid var(--border); margin-bottom:10px; transition: border-color 0.3s; }
+.explain-step:hover { border-color: var(--border-hover); }
+.explain-step-icon { font-size:1.4rem; flex-shrink:0; }
+.explain-step-title { font-weight:700; font-size:0.92rem; margin-bottom:6px; color: #ffffff; }
+.explain-step-detail { font-size:0.85rem; color:var(--muted); line-height: 1.5; }
+.fail-bar-row { margin-bottom:16px; }
+.fail-bar-label { font-size:0.85rem; font-weight:600; margin-bottom:6px; display:flex; justify-content:space-between; }
+.fail-bar { height:12px; border-radius:6px; transition:width .8s ease; }
+.neighbor-row { display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:var(--r); background:var(--card); border:1px solid var(--border); margin-bottom:8px; font-size:0.88rem; }
+.case-card { padding:20px; border-radius:var(--r); border:1px solid var(--border); margin-bottom:12px; background:var(--card); }
+.case-card.fail { border-left:4px solid var(--red-l); background:rgba(140,29,49,.02); }
+.case-card.success { border-left:4px solid var(--green-l); background:rgba(46,204,113,.02); }
+.case-type { font-size:0.75rem; font-weight:700; padding:3px 10px; border-radius:4px; display:inline-block; margin-bottom:10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.case-type.fail { background:rgba(140,29,49,.15); color:var(--gold); }
+.case-type.success { background:rgba(46,204,113,.15); color:var(--green-l); }
+.sota-best td { background:rgba(140,29,49,.04); font-weight:700; border-left:4px solid var(--red-l); }
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="nav-logo">🍷 <span>TIGER</span> Wine AI</div>
-  <button class="nav-tab active" onclick="showPanel('search')">🔍 Search</button>
-  <button class="nav-tab" onclick="showPanel('compare')">⚖️ Compare Models</button>
+  <div class="nav-logo">🍷 <span>TIGER-style</span> Wine AI</div>
+  <button class="nav-tab active" onclick="showPanel('search')">🔍 Tìm kiếm rượu</button>
+  <button class="nav-tab" onclick="showPanel('chatbot')">💬 AI Chatbot Tư vấn</button>
+  <button class="nav-tab" onclick="showPanel('compare')">⚖️ So sánh 5 Mô hình (Winemag)</button>
   <button class="nav-tab" onclick="showPanel('cf')">👤 Gợi ý Cá nhân (Sapo)</button>
-  <button class="nav-tab" onclick="showPanel('results')">📊 Thesis Evaluation</button>
-  <button class="nav-tab" onclick="showPanel('explain')">💡 Explainability</button>
-  <button class="nav-tab" onclick="showPanel('error')">🔬 Error Analysis</button>
-  <button class="nav-tab" onclick="showPanel('sota')">📚 SOTA Comparison</button>
+  <button class="nav-tab" onclick="showPanel('explain')">💡 Giải thích gợi ý</button>
   <div id="serverStatus" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--muted);">
     <span class="status-dot dot-green"></span> Server online
   </div>
@@ -280,7 +299,7 @@ select { cursor:pointer; }
     <div class="method-pill active" onclick="setMethod(this,'bm25')">📚 Sapo BM25</div>
     <div class="method-pill" onclick="setMethod(this,'tfidf')">🔢 Sapo TF-IDF</div>
     <div class="method-pill" style="border-color:rgba(212,160,23,0.5);color:var(--gold-l)" onclick="setMethod(this,'winemag')">🍷 Winemag 130K</div>
-    <div class="method-pill" style="border-color:rgba(230,57,70,0.5);color:var(--red-l);font-weight:800;" onclick="setMethod(this,'tiger_llm')">🤖 TIGER Llama-3 (Generative Retrieval)</div>
+    <div class="method-pill" style="border-color:rgba(230,57,70,0.5);color:var(--red-l);font-weight:800;" onclick="setMethod(this,'tiger_llm')">🤖 TIGER-style Llama-3 (Generative Retrieval)</div>
   </div>
 
   <div class="input-row" style="margin-bottom:16px;">
@@ -317,63 +336,103 @@ select { cursor:pointer; }
 </div>
 
 <!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: CHATBOT                                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-chatbot">
+  <div class="page-head">
+    <div class="page-eyebrow">Interactive Sommelier Consultation</div>
+    <div class="page-title">Master Sommelier AI Chatbot</div>
+    <div class="page-desc">Chat with our AI Sommelier to get personalized wine recommendations with detailed explanations based on flavor, country, variety, and price.</div>
+  </div>
+
+  <div class="card" style="display:flex; flex-direction:column; height: 500px; padding:0; overflow:hidden; border-radius:12px; border:1px solid var(--border);">
+    <!-- Chat messages list -->
+    <div id="chatMessages" style="flex:1; padding:20px; overflow-y:auto; background:#f0f2f5; display:flex; flex-direction:column; gap:12px;">
+      <div style="align-self:flex-start; background:var(--card); border:1px solid var(--border); border-radius:12px 12px 12px 0px; padding:14px 18px; max-width:80%; font-size:0.88rem; line-height:1.6; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <strong>🍷 Master Sommelier:</strong> Hello! I am your AI Master Sommelier. Let me know what kind of wine you are looking for. For example:
+        <ul style="margin-left:20px; margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+          <li>• <em>"I want a dry Italian red wine around $30 to pair with pasta"</em></li>
+          <li>• <em>"Buttery and oaky Chardonnay from Napa Valley"</em></li>
+          <li>• <em>"A cheap Pinot Noir under $25 with cherry and plum notes"</em></li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Quick recommendations suggest buttons inside input area -->
+    <div style="padding:10px 16px; background:#fafafa; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap; font-size:0.75rem; color:var(--muted); align-items:center;">
+      <span>Quick suggests:</span>
+      <button class="btn btn-ghost" style="padding:4px 10px; font-size:0.72rem; border-radius:100px;" onclick="sendQuickChatMessage('California Pinot Noir under $40')">California Pinot Noir under $40</button>
+      <button class="btn btn-ghost" style="padding:4px 10px; font-size:0.72rem; border-radius:100px;" onclick="sendQuickChatMessage('Bold red wine for steak dinner')">Bold red wine for steak dinner</button>
+      <button class="btn btn-ghost" style="padding:4px 10px; font-size:0.72rem; border-radius:100px;" onclick="sendQuickChatMessage('Italian Sangiovese with cherry flavor')">Italian Sangiovese with cherry flavor</button>
+    </div>
+    
+    <!-- Chat input area -->
+    <div style="padding:16px; background:var(--card); border-top:1px solid var(--border); display:flex; gap:10px; align-items:center;">
+      <input type="text" id="chatInput" style="flex:1; padding:12px 16px;" placeholder="Type your wine query or preference here..." onkeydown="if(event.key==='Enter')sendChatMessage()"/>
+      <button class="btn btn-red" style="padding:12px 24px;" onclick="sendChatMessage()">Send ✉️</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- PANEL 2: COMPARE                                        -->
 <!-- ═══════════════════════════════════════════════════════ -->
 <div class="panel" id="panel-compare">
   <div class="page-head">
-    <div class="page-eyebrow">Ablation Study · Baseline Method Comparison</div>
+    <div class="page-eyebrow">Ablation Study · Winemag 130K Baseline Comparison</div>
     <div class="page-title">Method Comparison (M1 - M5)</div>
-    <div class="page-desc">Enter a query and select a customer (optional) to see how the top recommendations and scores differ across all 5 models side-by-side.</div>
+    <div class="page-desc">Enter a query to see how the top recommendations and scores differ across all 5 models side-by-side on the Wine Reviews dataset.</div>
   </div>
 
   <div class="input-row" style="margin-bottom:24px;">
-    <input type="text" id="compareQuery" placeholder="Enter query for comparison..." value="Cabernet Sauvignon Pháp"/>
-    <select id="compareUser" style="max-width:300px;">
-      <option value="">-- No customer selected (Cold-Start) --</option>
-    </select>
-    <button class="btn btn-red" onclick="doCompare()">⚖️ Compare 5 Models</button>
+    <input type="text" id="compareQuery" placeholder="Nhập câu hỏi tìm rượu vang để so sánh..." value="Pinot Noir Pháp giá dưới $40"/>
+    <button class="btn btn-red" onclick="doCompare()">⚖️ So sánh 5 Mô hình</button>
   </div>
 
   <div id="compareArea" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:16px;">
-    <div class="compare-col bm25" style="flex:1;min-width:240px;">
+    <div class="compare-col tfidf" style="flex:1;min-width:230px;">
       <div class="compare-header">
-        <span>📚</span> M2: BM25
-        <span class="tag tag-blue" id="bm25time" style="margin-left:auto"></span>
-      </div>
-      <div class="compare-body" id="bm25results"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
-    </div>
-    <div class="compare-col tfidf" style="flex:1;min-width:240px;">
-      <div class="compare-header">
-        <span>🔢</span> M1: TF-IDF
+        <span>🔢</span> M1: TF-IDF CF
         <span class="tag tag-red" id="tfidfTime" style="margin-left:auto"></span>
       </div>
       <div class="compare-body" id="tfidfResults"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
     </div>
-    <div class="compare-col" style="flex:1;min-width:240px;">
+    
+    <div class="compare-col bm25" style="flex:1;min-width:230px;">
+      <div class="compare-header">
+        <span>📚</span> M2: Okapi BM25
+        <span class="tag tag-blue" id="bm25time" style="margin-left:auto"></span>
+      </div>
+      <div class="compare-body" id="bm25results"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
+    </div>
+
+    <div class="compare-col" style="flex:1;min-width:230px;">
       <div class="compare-header" style="background:rgba(45,157,58,.1);border-bottom:2px solid var(--green-l);">
-        <span>🤝</span> M3: CF
-        <span class="tag tag-green" id="cfTime" style="margin-left:auto"></span>
+        <span>⚙️</span> M3: Struct BM25
+        <span class="tag tag-green" id="structTime" style="margin-left:auto"></span>
       </div>
-      <div class="compare-body" id="cfResults_cmp"><div class="empty-state" style="padding:24px;">Select Customer First</div></div>
+      <div class="compare-body" id="structResults"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
     </div>
-    <div class="compare-col" style="flex:1;min-width:240px;">
+    
+    <div class="compare-col" style="flex:1;min-width:230px;">
       <div class="compare-header" style="background:rgba(212,160,23,.1);border-bottom:2px solid var(--gold-l);">
-        <span>⏱️</span> M4: Session
-        <span class="tag tag-gold" id="sessionTime" style="margin-left:auto"></span>
+        <span>🐯</span> ⚙️ M4: TIGER-style Hybrid
+        <span class="tag tag-gold" id="m1Time" style="margin-left:auto"></span>
       </div>
-      <div class="compare-body" id="sessionResults"><div class="empty-state" style="padding:24px;">Select Customer First</div></div>
+      <div class="compare-body" id="m1Results"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
     </div>
-    <div class="compare-col" style="flex:1;min-width:240px;">
+    
+    <div class="compare-col" style="flex:1;min-width:230px;">
       <div class="compare-header" style="background:rgba(230,57,70,.1);border-bottom:2px solid var(--red-l);">
-        <span>🏆</span> M5: Hybrid
-        <span class="tag tag-red" id="hybridTime" style="margin-left:auto"></span>
+        <span>🏆</span> M5: Model 2 (Ours)
+        <span class="tag tag-red" id="m2Time" style="margin-left:auto"></span>
       </div>
-      <div class="compare-body" id="hybridResults"><div class="empty-state" style="padding:24px;">Select Customer First</div></div>
+      <div class="compare-body" id="m2Results"><div class="empty-state" style="padding:24px;">Click Compare →</div></div>
     </div>
   </div>
 
   <div id="compareInsight" style="display:none;margin-top:20px;" class="card">
-    <div class="section-title">💡 Insight Analysis</div>
+    <div class="section-title">💡 Phân tích Đối chiếu (Insight Analysis)</div>
     <div id="insightText" style="font-size:0.85rem;color:var(--muted);line-height:1.7;"></div>
   </div>
 </div>
@@ -435,65 +494,6 @@ select { cursor:pointer; }
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- PANEL 4: RESULTS                                        -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="panel" id="panel-results">
-  <div class="page-head">
-    <div class="page-eyebrow">Thesis Evaluation · Winemag 130K · N=500 test</div>
-    <div class="page-title">Overall Benchmark & Ablation Study</div>
-    <div class="page-desc">Official benchmark results reported in the thesis. The proposed Hybrid model significantly outperforms all lexical and GNN baselines.</div>
-  </div>
-
-  <div class="grid4" style="margin-bottom:24px;">
-    <div class="stat-card r"><div class="stat-lbl">Recall@10 (Proposed)</div><div class="stat-val">5.60%</div><div class="stat-sub">vs BM25+ 3.80% (+1.47×)</div></div>
-    <div class="stat-card y"><div class="stat-lbl">NDCG@10 (Proposed)</div><div class="stat-val">3.40%</div><div class="stat-sub">vs BM25+ 2.01% (+1.69×)</div></div>
-    <div class="stat-card b"><div class="stat-lbl">Cluster Match@1</div><div class="stat-val">8.20%</div><div class="stat-sub">= 41× Exact Match@1</div></div>
-    <div class="stat-card g"><div class="stat-lbl">Valid ID Rate</div><div class="stat-val">99.6%</div><div class="stat-sub">Valid LLM identifier generation</div></div>
-  </div>
-
-  <div class="grid2" style="margin-bottom:20px;">
-    <div class="card">
-      <div class="section-title">📊 Recall@K Curve</div>
-      <div style="position:relative;height:260px;"><canvas id="curveChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="section-title">🍷 Sapo: CF vs No-History</div>
-      <div style="position:relative;height:260px;"><canvas id="sapoChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-title">📋 Full Benchmark Results Table (Winemag — N=500)</div>
-    <table class="data-table">
-      <thead><tr><th>Method</th><th>Recall@1</th><th>Recall@5</th><th>Recall@10</th><th>NDCG@10</th><th>MRR</th><th>Latency</th></tr></thead>
-      <tbody>
-        <tr><td>TF-IDF CF</td><td>0.00%</td><td>0.80%</td><td>1.80%</td><td>0.79%</td><td>0.48%</td><td>1.4ms</td></tr>
-        <tr><td>BM25</td><td>0.60%</td><td>1.40%</td><td>2.60%</td><td>1.34%</td><td>0.97%</td><td>238ms</td></tr>
-        <tr><td>BM25+ Enhanced</td><td>0.80%</td><td>2.40%</td><td>3.80%</td><td>2.01%</td><td>1.48%</td><td>339ms</td></tr>
-        <tr><td>GNN-Filter</td><td>0.20%</td><td>0.80%</td><td>1.20%</td><td>0.58%</td><td>0.39%</td><td>97ms</td></tr>
-        <tr><td>TIGER Greedy (LLM only)</td><td>0.20%</td><td>0.20%</td><td>0.20%</td><td>0.20%</td><td>0.20%</td><td>2,278ms</td></tr>
-        <tr class="best"><td>🏆 TIGER + Price Rerank <span class="tag tag-red">Proposed</span></td><td>1.60%</td><td>4.60%</td><td>5.60%</td><td>3.40%</td><td>2.71%</td><td>2,278ms</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="card">
-    <div class="section-title">🏪 Sapo Ablation Study — 5 Methods (N=150, Leave-One-Out)</div>
-    <table class="data-table">
-      <thead><tr><th>Method</th><th>Uses History?</th><th>Recall@1</th><th>Recall@10</th><th>NDCG@10</th><th>MRR</th></tr></thead>
-      <tbody>
-        <tr><td>M1: Content TF-IDF</td><td>❌</td><td>1.33%</td><td>18.67%</td><td>9.86%</td><td>7.06%</td></tr>
-        <tr><td>M2: Content BM25</td><td>❌</td><td>0.67%</td><td>21.33%</td><td>10.39%</td><td>6.98%</td></tr>
-        <tr class="best"><td>M3: Collaborative Filtering <span class="tag tag-green">Best</span></td><td>✅</td><td>56.00%</td><td>81.33%</td><td>68.52%</td><td>64.45%</td></tr>
-        <tr><td>M4: Session-Based</td><td>✅</td><td>10.00%</td><td>22.67%</td><td>16.22%</td><td>14.15%</td></tr>
-        <tr><td>M5: Hybrid CF + Content</td><td>✅</td><td>11.33%</td><td>34.67%</td><td>21.41%</td><td>17.38%</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- PANEL 5: EXPLAIN                                        -->
@@ -509,85 +509,7 @@ select { cursor:pointer; }
   <div id="explainContent" style="display:none;"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- PANEL 6: ERROR ANALYSIS                                 -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="panel" id="panel-error">
-  <div class="page-head">
-    <div class="page-eyebrow">Error Analysis · TIGER Llama-3 · N=500 Test Cases</div>
-    <div class="page-title">Failure Modes & Error Analysis</div>
-  </div>
 
-  <div class="grid4" style="margin-bottom:24px;">
-    <div class="stat-card r"><div class="stat-lbl">Total Test Cases</div><div class="stat-val" id="ea_total">500</div><div class="stat-sub">Greedy beam search</div></div>
-    <div class="stat-card b"><div class="stat-lbl">Cluster Match@1</div><div class="stat-val" id="ea_cluster1">7.0%</div><div class="stat-sub">Correct cluster</div></div>
-    <div class="stat-card y"><div class="stat-lbl">Recall@1</div><div class="stat-val" id="ea_r1">0.0%</div><div class="stat-sub">Exact item match</div></div>
-    <div class="stat-card g"><div class="stat-lbl">Recall@10</div><div class="stat-val" id="ea_r10">0.0%</div><div class="stat-sub">Top-10 items recall</div></div>
-  </div>
-
-  <div class="card" style="margin-bottom:20px;">
-    <div class="section-title">🔴 Failure Distribution by Category</div>
-    <div id="ea_bars">
-      <div class="fail-bar-row"><div class="fail-bar-label"><span>Wrong Cluster (LLM prediction error)</span><span>314 (62%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:62%;background:#e63946;"></div></div></div>
-      <div class="fail-bar-row"><div class="fail-bar-label"><span>Old World Ambiguity (Italy/France/Spain)</span><span>138 (27%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:27%;background:#f4a261;"></div></div></div>
-      <div class="fail-bar-row"><div class="fail-bar-label"><span>Correct cluster, wrong specific item</span><span>35 (7%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:7%;background:#e9c46a;"></div></div></div>
-      <div class="fail-bar-row"><div class="fail-bar-label"><span>High Price Ambiguity (&gt;$100)</span><span>13 (2%)</span></div><div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;"><div class="fail-bar" style="width:2%;background:#219ebc;"></div></div></div>
-    </div>
-  </div>
-
-  <div class="grid2" style="margin-bottom:20px;">
-    <div class="card">
-      <div class="section-title">📊 Errors by Price Bracket</div>
-      <div style="position:relative;height:220px;"><canvas id="priceFailChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="section-title">🌍 Errors by Country</div>
-      <div style="position:relative;height:220px;"><canvas id="countryFailChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-title">🔍 Case Studies</div>
-    <div id="ea_cases"><div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- PANEL 7: SOTA                                           -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="panel" id="panel-sota">
-  <div class="page-head">
-    <div class="page-eyebrow">State of the Art · 2022-2024</div>
-    <div class="page-title">Comparison with State-of-the-Art Methods</div>
-  </div>
-
-  <div class="card" style="background:rgba(33,158,188,.06);border-color:rgba(33,158,188,.25);margin-bottom:20px;">
-    Comparison against major baseline directions: (1) Lexical, (2) Vector-based, and (3) Generative Retrieval.
-  </div>
-
-  <div class="card" style="margin-bottom:20px;">
-    <table class="data-table">
-      <thead><tr><th>Method</th><th>Year</th><th>Dataset</th><th>Recall@10</th><th>Backbone</th><th>Type</th></tr></thead>
-      <tbody>
-        <tr><td>BM25 (Baseline)</td><td>2009</td><td>Winemag-130K</td><td>5.54%</td><td>Lexical</td><td>Lexical Search</td></tr>
-        <tr><td>P5 (Geng et al.)</td><td>2022</td><td>Amazon</td><td>3.8%</td><td>T5-base</td><td>Generative</td></tr>
-        <tr><td>DSI (Tay et al.)</td><td>2022</td><td>NQ/Trivia</td><td>N/A</td><td>T5-large</td><td>Generative Retrieval</td></tr>
-        <tr><td>BIGRec (Hou et al.)</td><td>2023</td><td>Amazon</td><td>4.1%</td><td>Llama-2-7B</td><td>LLM Prompting</td></tr>
-        <tr><td>TIGER (Rajput et al.)</td><td>2023</td><td>Amazon Beauty</td><td>8.3%</td><td>T5-base</td><td>Generative Retrieval</td></tr>
-        <tr><td>LLMRank (Hou et al.)</td><td>2023</td><td>Amazon</td><td>5.2%</td><td>ChatGPT</td><td>LLM Reranking</td></tr>
-        <tr><td>CoLLM (Zhang et al.)</td><td>2024</td><td>Amazon</td><td>6.7%</td><td>Llama-2-13B</td><td>Collaborative LLM</td></tr>
-        <tr><td>HSTU (Zhai et al.)</td><td>2024</td><td>Internal Meta</td><td>12.4%</td><td>Transformer</td><td>Sequential</td></tr>
-        <tr class="sota-best"><td><strong>Proposed Hybrid (TIGER + Price Rerank)</strong></td><td>2025</td><td>Winemag-130K</td><td>7.76%*</td><td>Llama-3-8B</td><td>Generative Retrieval</td></tr>
-        <tr class="sota-best"><td><strong>This work (Sapo CF)</strong></td><td>2025</td><td>Sapo (VN)</td><td>81.33%</td><td>User-Item CF</td><td>Collaborative</td></tr>
-      </tbody>
-    </table>
-    <div style="font-size:0.72rem;color:var(--muted);margin-top:12px;">* Direct comparison is difficult due to different domains and test sets. Our cold-start setting (no user history) on 130K wine catalog.</div>
-  </div>
-
-  <div class="card" style="background:rgba(230,57,70,.04);border-color:rgba(230,57,70,.2);">
-    📊 <strong>Remarks:</strong> The proposed TIGER Hybrid system achieves Recall@10 = 7.76% on Winemag-130K cold-start retrieval, significantly outperforming the BM25 baseline (5.54%). Under Sapo warm-start recommender settings, the CF approach achieves 81.33%, outperforming all content-based baselines.
-  </div>
-</div>
 
 </main>
 
@@ -608,17 +530,130 @@ select { cursor:pointer; }
 
 <script>
 let currentMethod = 'bm25';
-let charts = {};
 
 // ── Navigation ──────────────────────────────────────────────────────────
 function showPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  event.target.classList.add('active');
+  
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(t => {
+    if(t.getAttribute('onclick') === `showPanel('${name}')`) {
+      t.classList.add('active');
+    }
+  });
+  
   if(name === 'cf' && !window.cfLoaded) loadUsers();
-  if(name === 'results' && !window.chartsBuilt) buildCharts();
-  if(name === 'error' && !window.errorLoaded2) { window.errorLoaded2=true; loadErrorAnalysis(); }
+}
+
+// ── Chatbot ──────────────────────────────────────────────────────────────
+async function sendChatMessage() {
+  const inputEl = document.getElementById('chatInput');
+  const query = inputEl.value.trim();
+  if(!query) return;
+
+  inputEl.value = '';
+  appendChatMessage('user', query);
+
+  const thinkingId = 'thinking-' + Date.now();
+  const chatMessagesEl = document.getElementById('chatMessages');
+  const thinkingBubble = document.createElement('div');
+  thinkingBubble.id = thinkingId;
+  thinkingBubble.style.alignSelf = 'flex-start';
+  thinkingBubble.style.background = 'var(--card)';
+  thinkingBubble.style.border = '1px solid var(--border)';
+  thinkingBubble.style.borderRadius = '12px 12px 12px 0px';
+  thinkingBubble.style.padding = '14px 18px';
+  thinkingBubble.style.maxWidth = '80%';
+  thinkingBubble.style.fontSize = '0.88rem';
+  thinkingBubble.style.lineHeight = '1.6';
+  thinkingBubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+  thinkingBubble.innerHTML = `<strong>🍷 Master Sommelier:</strong> <div class="loading-dots"><span></span><span></span><span></span></div>`;
+  chatMessagesEl.appendChild(thinkingBubble);
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ query })
+    });
+    const data = await res.json();
+    
+    thinkingBubble.remove();
+    appendChatMessage('sommelier', data.response, data.wine);
+  } catch(e) {
+    thinkingBubble.remove();
+    appendChatMessage('sommelier', 'Sorry, the AI Sommelier is currently busy. Please try again later.');
+  }
+}
+
+function sendQuickChatMessage(q) {
+  document.getElementById('chatInput').value = q;
+  sendChatMessage();
+}
+
+function appendChatMessage(sender, text, wine = null) {
+  const chatMessagesEl = document.getElementById('chatMessages');
+  const bubble = document.createElement('div');
+  
+  if (sender === 'user') {
+    bubble.style.alignSelf = 'flex-end';
+    bubble.style.background = 'var(--red-l)';
+    bubble.style.color = '#fff';
+    bubble.style.borderRadius = '12px 12px 0px 12px';
+    bubble.style.padding = '12px 16px';
+    bubble.style.maxWidth = '80%';
+    bubble.style.fontSize = '0.88rem';
+    bubble.style.lineHeight = '1.6';
+    bubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    bubble.innerHTML = `<strong>You:</strong> ${escapeHtml(text)}`;
+  } else {
+    bubble.style.alignSelf = 'flex-start';
+    bubble.style.background = 'var(--card)';
+    bubble.style.border = '1px solid var(--border)';
+    bubble.style.borderRadius = '12px 12px 12px 0px';
+    bubble.style.padding = '14px 18px';
+    bubble.style.maxWidth = '80%';
+    bubble.style.fontSize = '0.88rem';
+    bubble.style.lineHeight = '1.6';
+    bubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+    
+    let formattedText = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/\n/g, '<br>');
+      
+    bubble.innerHTML = `<strong>🍷 Master Sommelier:</strong><br>${formattedText}`;
+    
+    if (wine) {
+      const wineCard = document.createElement('div');
+      wineCard.style.marginTop = '12px';
+      wineCard.style.padding = '10px';
+      wineCard.style.background = 'rgba(192,57,43,0.05)';
+      wineCard.style.border = '1px solid rgba(192,57,43,0.15)';
+      wineCard.style.borderRadius = '8px';
+      wineCard.style.cursor = 'pointer';
+      wineCard.style.transition = 'all 0.2s';
+      wineCard.onclick = () => showProduct(wine.sku);
+      wineCard.innerHTML = `
+        <div style="font-weight:700;font-size:0.8rem;color:var(--red-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${wine.name}</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">
+          Price: <strong style="color:var(--gold-l);">${wine.price || 'N/A'}</strong> | Rating: <strong>${wine.score || '88'} pts</strong>
+        </div>
+      `;
+      bubble.appendChild(wineCard);
+    }
+  }
+  
+  chatMessagesEl.appendChild(bubble);
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
 // ── Method ──────────────────────────────────────────────────────────────
@@ -723,7 +758,7 @@ async function doSearch() {
         `;
         
         document.getElementById('sp5detail').textContent = `${data.results.length} results · ${data.latency_ms}ms`;
-        renderResults('llmFinalResults', data.results, data.latency_ms, 'TIGER Llama-3');
+        renderResults('llmFinalResults', data.results, data.latency_ms, 'TIGER-style Llama-3');
       }, 2400);
     } catch(e) {
       el.innerHTML = '<div class="empty-state">❌ Server offline</div>';
@@ -776,10 +811,9 @@ function renderResults(containerId, results, latency, method) {
 // ── Compare ──────────────────────────────────────────────────────────────
 async function doCompare() {
   const query = document.getElementById('compareQuery').value.trim();
-  const user = document.getElementById('compareUser').value;
-  if(!query && !user) return;
+  if(!query) return;
 
-  const cols = ['bm25results', 'tfidfResults', 'cfResults_cmp', 'sessionResults', 'hybridResults'];
+  const cols = ['tfidfResults', 'bm25results', 'structResults', 'm1Results', 'm2Results'];
   cols.forEach(id => {
     document.getElementById(id).innerHTML = '<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
   });
@@ -788,15 +822,15 @@ async function doCompare() {
   try {
     const res = await fetch('/api/compare', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({query, user})
+      body: JSON.stringify({query})
     });
     const data = await res.json();
 
-    document.getElementById('bm25time').textContent = data.bm25.latency_ms + 'ms';
     document.getElementById('tfidfTime').textContent = data.tfidf.latency_ms + 'ms';
-    document.getElementById('cfTime').textContent = data.cf.latency_ms ? data.cf.latency_ms + 'ms' : '';
-    document.getElementById('sessionTime').textContent = data.session.latency_ms ? data.session.latency_ms + 'ms' : '';
-    document.getElementById('hybridTime').textContent = data.hybrid.latency_ms ? data.hybrid.latency_ms + 'ms' : '';
+    document.getElementById('bm25time').textContent = data.bm25.latency_ms + 'ms';
+    document.getElementById('structTime').textContent = data.struct.latency_ms + 'ms';
+    document.getElementById('m1Time').textContent = data.m1.latency_ms + 'ms';
+    document.getElementById('m2Time').textContent = data.m2.latency_ms + 'ms';
 
     function renderCompare(containerId, results, matchRefSkus) {
       if(!results || !results.length) {
@@ -809,7 +843,7 @@ async function doCompare() {
           <div class="compare-rank">#${i+1}</div>
           <div style="flex:1;min-width:0;">
             <div class="compare-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${w.name}</div>
-            <div class="compare-score">Score: ${(+w.score).toFixed(3)}</div>
+            <div class="compare-score">Score: ${(+w.score).toFixed(1)}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
             <span class="compare-price">${w.price||'N/A'}</span>
@@ -819,23 +853,23 @@ async function doCompare() {
       }).join('');
     }
 
-    const bm25skus  = data.bm25.results.map(r=>r.sku);
-    renderCompare('bm25results',  data.bm25.results,  null);
-    renderCompare('tfidfResults', data.tfidf.results, bm25skus); // TF-IDF vs BM25
-
-    if (user) {
-      renderCompare('cfResults_cmp', data.cf.results, null);
-      renderCompare('sessionResults', data.session.results, null);
-      renderCompare('hybridResults', data.hybrid.results, bm25skus); // Hybrid vs BM25
-    } else {
-      document.getElementById('cfResults_cmp').innerHTML = '<div class="empty-state" style="padding:24px;">Select Customer First</div>';
-      document.getElementById('sessionResults').innerHTML = '<div class="empty-state" style="padding:24px;">Select Customer First</div>';
-      document.getElementById('hybridResults').innerHTML = '<div class="empty-state" style="padding:24px;">Select Customer First</div>';
-    }
+    const tfidfSkus = data.tfidf.results.map(r=>r.sku);
+    renderCompare('tfidfResults',  data.tfidf.results,  null);
+    renderCompare('bm25results',   data.bm25.results,   tfidfSkus); 
+    renderCompare('structResults', data.struct.results, tfidfSkus); 
+    renderCompare('m1Results',     data.m1.results,     tfidfSkus); 
+    renderCompare('m2Results',     data.m2.results,     tfidfSkus); 
 
     document.getElementById('insightText').innerHTML = `
-      <p>Query: <strong>"${query}"</strong> ${user ? `| Customer: <strong>${user}</strong>` : ''}</p><br>
-      <p><strong>M1/M2 (Content-based):</strong> Relies solely on query text. <strong>M3 (CF):</strong> Relies solely on user purchase history / collaborative filtering (ignores query). <strong>M5 (Hybrid):</strong> Candidate generation via Collaborative Filtering + reranked using lexical matching query.</p>
+      <p>Query: <strong>"${query}"</strong></p><br>
+      <p><strong>Method Comparison Analysis:</strong></p>
+      <ul>
+        <li><strong>M1 (TF-IDF CF):</strong> Simple term-frequency vector representation. Fails to parse complex constraints like price boundaries or negation.</li>
+        <li><strong>M2 (Okapi BM25):</strong> Strong lexical search but lacks understanding of structured constraints (e.g. treats "under $40" as text keywords).</li>
+        <li><strong>M3 (Struct BM25):</strong> Adds structured filtering on top of BM25 but relies on rigid keyword parsing.</li>
+        <li><strong>M4 (TIGER Hybrid):</strong> Generative Retrieval using Llama-3-8B. Translates query into semantic index codes. Highly accurate but suffers from high latency (typical: ~2.2 seconds).</li>
+        <li><strong>M5 (Model 2 - Ours):</strong> Hybrid Parser + Struct-Filter + Rerank. Achieves near-generative accuracy with sub-100ms latency.</li>
+      </ul>
     `;
     document.getElementById('compareInsight').style.display = 'block';
   } catch(e) {
@@ -850,7 +884,6 @@ async function loadUsers() {
     const res = await fetch('/api/users');
     const users = await res.json();
     const el = document.getElementById('userList');
-    const select = document.getElementById('compareUser');
     
     el.innerHTML = users.map(u => `
       <div class="user-item" onclick="selectUser('${u.user.replace(/'/g,"\\'")}', this)">
@@ -861,13 +894,6 @@ async function loadUsers() {
         <span class="tag tag-gold">${u.n_products} SP</span>
       </div>
     `).join('');
-
-    users.forEach(u => {
-      const opt = document.createElement('option');
-      opt.value = u.user;
-      opt.textContent = `${u.user} (${u.n_products} SP)`;
-      select.appendChild(opt);
-    });
   } catch(e) {
     document.getElementById('userList').innerHTML = '<div class="empty-state">❌ Server offline</div>';
   }
@@ -955,63 +981,13 @@ async function showProduct(sku) {
 }
 function closeModal() { document.getElementById('productModal').classList.remove('open'); }
 
-// ── Charts ────────────────────────────────────────────────────────────────
-function buildCharts() {
-  window.chartsBuilt = true;
-  // Recall@K curve
-  const c1 = document.getElementById('curveChart').getContext('2d');
-  charts.curve = new Chart(c1, {
-    type:'line',
-    data:{
-      labels:['K=1','K=5','K=10'],
-      datasets:[
-        {label:'BM25+ Enhanced',data:[0.80,2.40,3.80],borderColor:'#219ebc',pointRadius:6,tension:.3,borderWidth:2},
-        {label:'TIGER Greedy',data:[0.20,0.20,0.20],borderColor:'#e9c46a',pointRadius:6,tension:.3,borderWidth:2,borderDash:[5,5]},
-        {label:'🏆 TIGER+Price Rerank',data:[1.60,4.60,5.60],borderColor:'#e63946',backgroundColor:'rgba(230,57,70,.1)',fill:true,pointRadius:8,tension:.3,borderWidth:3},
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'#2c3e50',font:{size:10}}}},
-      scales:{
-        x:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}},
-        y:{ticks:{color:'#2c3e50',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'},beginAtZero:true}
-      }
-    }
-  });
 
-  // Sapo CF vs no-history
-  const c2 = document.getElementById('sapoChart').getContext('2d');
-  charts.sapo = new Chart(c2, {
-    type:'bar',
-    data:{
-      labels:['TF-IDF\n(no hist)','BM25\n(no hist)','Collab.\nFilter','Session\nBased','Hybrid\nCF+Content'],
-      datasets:[
-        {label:'Recall@1',data:[1.33,0.67,56.00,10.00,11.33],backgroundColor:['#8ecae6','#219ebc','#3ddc57','#e9c46a','#e63946'],borderRadius:4},
-        {label:'Recall@10',data:[18.67,21.33,81.33,22.67,34.67],backgroundColor:['#8ecae688','#219ebc88','#3ddc5788','#e9c46a88','#e6394688'],borderRadius:4},
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'#2c3e50',font:{size:10}},position:'top'}},
-      scales:{
-        x:{ticks:{color:'#2c3e50',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}},
-        y:{ticks:{color:'#2c3e50',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}},
-      }
-    }
-  });
-}
 
 // ── Explain ──────────────────────────────────────────────────────────────────
 let lastSearchContext = {method: 'bm25', query: '', user: ''};
 
 async function showExplain(sku) {
   showPanel('explain');
-  // Programmatically click the explain nav tab
-  document.querySelectorAll('.nav-tab').forEach((t,i) => {
-    if(t.textContent.includes('Explainability')) t.classList.add('active');
-    else t.classList.remove('active');
-  });
   const el = document.getElementById('explainContent');
   el.style.display = 'block';
   el.innerHTML = '<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
@@ -1055,77 +1031,7 @@ async function showExplain(sku) {
   } catch(e) { el.innerHTML = '<div class="empty-state">❌ Server offline</div>'; }
 }
 
-// ── Error Analysis ──────────────────────────────────────────────────────────
-let errorLoaded = false;
-async function loadErrorAnalysis() {
-  if(errorLoaded) return; errorLoaded = true;
-  try {
-    const res = await fetch('/api/error_analysis');
-    const d = await res.json();
-    const s = d.stats;
-    // Update stat values
-    document.getElementById('ea_total').textContent = s.total;
-    document.getElementById('ea_cluster1').textContent = s.cluster_match1 + '%';
-    document.getElementById('ea_r1').textContent = s.recall1 + '%';
-    document.getElementById('ea_r10').textContent = s.recall10 + '%';
-    
-    // Failure breakdown bars
-    const failBreakdown = [
-      {label:'Wrong Cluster (LLM sai cụm)', key:'wrong_cluster', count: s.failure_breakdown.wrong_cluster||0, color:'#e63946'},
-      {label:'Old World Ambiguity (Italy/France/Spain)', key:'old_world_ambiguity', count: s.failure_breakdown.old_world_ambiguity||0, color:'#f4a261'},
-      {label:'Cluster OK nhưng sai item cụ thể', key:'cluster_ok_item_miss', count: s.failure_breakdown.cluster_ok_item_miss||0, color:'#e9c46a'},
-      {label:'High Price Ambiguity (>$100)', key:'high_price_ambiguity', count: s.failure_breakdown.high_price_ambiguity||0, color:'#219ebc'},
-    ];
-    const barsEl = document.getElementById('ea_bars');
-    barsEl.innerHTML = failBreakdown.map(f => `
-      <div class="fail-bar-row">
-        <div class="fail-bar-label"><span>${f.label}</span><span style="color:var(--text);">${f.count} (${Math.round(f.count/s.total*100)}%)</span></div>
-        <div style="background:rgba(255,255,255,.08);border-radius:5px;height:10px;">
-          <div class="fail-bar" style="width:${Math.round(f.count/s.total*100)}%;background:${f.color};"></div>
-        </div>
-      </div>
-    `).join('');
-    
-    // Price chart
-    const priceKeys = Object.keys(s.fail_by_price);
-    const priceVals = Object.values(s.fail_by_price);
-    const pctx = document.getElementById('priceFailChart').getContext('2d');
-    new Chart(pctx, {type:'bar', data:{
-      labels: priceKeys,
-      datasets:[{label:'Số lỗi', data:priceVals, backgroundColor:['#e63946aa','#f4a261aa','#e9c46aaa','#219ebcaa','#8ecae6aa'], borderRadius:4}]
-    }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
-    
-    // Country chart
-    const countries = Object.keys(s.fail_by_country).filter(k=>k);
-    const countryVals2 = countries.map(k=>s.fail_by_country[k]);
-    const cctx = document.getElementById('countryFailChart').getContext('2d');
-    new Chart(cctx, {type:'bar', data:{
-      labels: countries,
-      datasets:[{label:'Số lỗi', data:countryVals2, backgroundColor:'#e6394888', borderRadius:4}]
-    }, options:{indexAxis:'y', responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{color:'#2c3e50'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
-    
-    // Case studies
-    const casesEl = document.getElementById('ea_cases');
-    casesEl.innerHTML = d.samples.map(c => {
-      const isSuccess = c.type === 'success';
-      const typeLabels = {
-        wrong_cluster: 'Wrong Cluster', old_world_ambiguity: 'Old World Ambiguity',
-        cluster_ok_item_miss: 'Cluster OK, Wrong Item', high_price_ambiguity: 'High Price Ambiguity', success: 'Success'
-      };
-      return `<div class="case-card ${isSuccess?'success':'fail'}">
-        <span class="case-type ${isSuccess?'success':'fail'}">${typeLabels[c.type]||c.type}</span>
-        <div style="font-size:0.82rem;font-weight:600;margin-bottom:8px;">${c.instruction}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.75rem;">
-          <div><span style="color:var(--muted);">Target: </span><span style="color:var(--gold-l);">${c.target_id}</span> <span style="color:var(--muted);">(cluster ${c.target_cluster})</span></div>
-          <div><span style="color:var(--muted);">Predicted: </span><span style="color:${isSuccess?'var(--green-l)':'var(--red-l)'}">${c.pred_top1}</span> <span style="color:var(--muted);">(cluster ${c.pred_cluster})</span></div>
-        </div>
-        ${!isSuccess ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:8px;">💡 Root Cause: ${{wrong_cluster:'LLM predicted wrong cluster due to semantic overlap', old_world_ambiguity:'Multiple clusters match Old World wine (Italy/France/Spain)', cluster_ok_item_miss:'Correct cluster, but 130K items in cluster → item rank is low', high_price_ambiguity:'High price ($100+) has sparse data → LLM is less accurate'}[c.type]||''}</div>` : '<div style="font-size:0.72rem;color:var(--green-l);margin-top:8px;">✓ LLM successfully generated both correct cluster and item ID</div>'}
-      </div>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('ea_cases').innerHTML = '<div class="empty-state">❌ Failed to load data</div>';
-  }
-}
+
 
 // ── Load catalog stats ────────────────────────────────────────────────────
 async function loadStats() {
